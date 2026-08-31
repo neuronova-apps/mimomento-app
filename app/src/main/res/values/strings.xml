@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Mi Momento</string>
+    <string name="content_loading">Preparando contenido local…</string>
+    <string name="content_available">%1$d devocionales disponibles</string>
+    <string name="content_error">No se pudo cargar el contenido local</string>
+</resources>
