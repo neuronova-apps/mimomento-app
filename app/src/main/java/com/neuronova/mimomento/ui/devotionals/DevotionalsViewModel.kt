@@ -19,6 +19,14 @@ data class CategoryFilterItem(
     val count: Int,
 )
 
+data class DevotionalDetailUiState(
+    val devotional: Devotional? = null,
+    val categoryName: String = "",
+    val previousDevotionalId: String? = null,
+    val nextDevotionalId: String? = null,
+    val isNotFound: Boolean = false,
+)
+
 data class DevotionalsUiState(
     val allDevotionals: List<Devotional> = emptyList(),
     val categories: List<Category> = emptyList(),
@@ -94,12 +102,35 @@ class DevotionalsViewModel(
         )
     }
 
+    fun getDevotionalDetailUiState(id: String): DevotionalDetailUiState {
+        val devotional = repository.getDevotionalById(id)
+            ?: return DevotionalDetailUiState(isNotFound = true)
+
+        val previousId = repository.getPreviousDevotionalId(id)
+        val nextId = repository.getNextDevotionalId(id)
+        val categoryName = getCategoryName(devotional.categoryId)
+
+        return DevotionalDetailUiState(
+            devotional = devotional,
+            categoryName = categoryName,
+            previousDevotionalId = previousId,
+            nextDevotionalId = nextId,
+            isNotFound = false,
+        )
+    }
+
+    fun getPreviousDevotionalId(id: String): String? = repository.getPreviousDevotionalId(id)
+
+    fun getNextDevotionalId(id: String): String? = repository.getNextDevotionalId(id)
+
     fun getDevotionalById(id: String): Devotional? {
         return repository.getDevotionalById(id)
     }
 
     fun getCategoryName(categoryId: String): String {
-        return _uiState.value.categoryNamesById[categoryId] ?: categoryId
+        return _uiState.value.categoryNamesById[categoryId]
+            ?: repository.getCategories().firstOrNull { it.id == categoryId }?.name
+            ?: categoryId
     }
 
     companion object {

@@ -1,4 +1,4 @@
-﻿package com.neuronova.mimomento.ui.devotionals
+package com.neuronova.mimomento.ui.devotionals
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -8,12 +8,17 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowForward
+import androidx.compose.material.icons.automirrored.filled.MenuBook
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
@@ -22,8 +27,10 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SuggestionChip
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
@@ -39,11 +46,14 @@ import com.neuronova.mimomento.data.model.Devotional
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DevotionalDetailScreen(
-    devotional: Devotional?,
-    categoryName: String,
+    uiState: DevotionalDetailUiState,
     onNavigateUp: () -> Unit,
+    onNavigateToDevotional: (String) -> Unit = {},
     modifier: Modifier = Modifier,
 ) {
+    val devotional = uiState.devotional
+    val isNotFound = uiState.isNotFound || devotional == null
+
     Scaffold(
         modifier = modifier.fillMaxSize(),
         topBar = {
@@ -52,10 +62,14 @@ fun DevotionalDetailScreen(
                     Text(
                         text = stringResource(R.string.detail_title),
                         style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.SemiBold,
                     )
                 },
                 navigationIcon = {
-                    IconButton(onClick = onNavigateUp) {
+                    IconButton(
+                        onClick = onNavigateUp,
+                        modifier = Modifier.size(48.dp),
+                    ) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = stringResource(R.string.action_back),
@@ -64,20 +78,49 @@ fun DevotionalDetailScreen(
                 },
             )
         },
+        bottomBar = {
+            if (!isNotFound) {
+                DevotionalDetailBottomBar(
+                    previousDevotionalId = uiState.previousDevotionalId,
+                    nextDevotionalId = uiState.nextDevotionalId,
+                    onNavigateToDevotional = onNavigateToDevotional,
+                )
+            }
+        },
     ) { innerPadding ->
-        if (devotional == null) {
+        if (isNotFound) {
             DevotionalNotFoundView(
                 onNavigateUp = onNavigateUp,
                 modifier = Modifier.padding(innerPadding),
             )
         } else {
             DevotionalDetailContent(
-                devotional = devotional,
-                categoryName = categoryName,
+                devotional = devotional!!,
+                categoryName = uiState.categoryName,
                 modifier = Modifier.padding(innerPadding),
             )
         }
     }
+}
+
+@Composable
+fun DevotionalDetailScreen(
+    devotional: Devotional?,
+    categoryName: String,
+    onNavigateUp: () -> Unit,
+    onNavigateToDevotional: (String) -> Unit = {},
+    modifier: Modifier = Modifier,
+) {
+    DevotionalDetailScreen(
+        uiState = DevotionalDetailUiState(
+            devotional = devotional,
+            categoryName = categoryName,
+            isNotFound = devotional == null,
+        ),
+        onNavigateUp = onNavigateUp,
+        onNavigateToDevotional = onNavigateToDevotional,
+        modifier = modifier,
+    )
 }
 
 @Composable
@@ -92,19 +135,21 @@ private fun DevotionalDetailContent(
         modifier = modifier
             .fillMaxSize()
             .verticalScroll(scrollState)
-            .padding(horizontal = 20.dp, vertical = 16.dp),
+            .padding(horizontal = 20.dp, vertical = 12.dp),
     ) {
+        // 1. Category & Estimated Reading Time
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
         ) {
             SuggestionChip(
-                onClick = { /* informative badge */ },
+                onClick = { /* Informative category badge */ },
                 label = {
                     Text(
-                        text = categoryName,
-                        style = MaterialTheme.typography.labelSmall,
+                        text = categoryName.ifBlank { devotional.categoryId },
+                        style = MaterialTheme.typography.labelMedium,
+                        fontWeight = FontWeight.Medium,
                     )
                 },
             )
@@ -121,6 +166,7 @@ private fun DevotionalDetailContent(
 
         Spacer(modifier = Modifier.height(12.dp))
 
+        // 2. Title
         Text(
             text = devotional.title,
             style = MaterialTheme.typography.headlineMedium,
@@ -128,49 +174,86 @@ private fun DevotionalDetailContent(
             color = MaterialTheme.colorScheme.onSurface,
         )
 
-        Spacer(modifier = Modifier.height(6.dp))
+        Spacer(modifier = Modifier.height(14.dp))
 
-        Text(
-            text = devotional.bibleReference,
-            style = MaterialTheme.typography.titleMedium,
-            fontWeight = FontWeight.SemiBold,
-            color = MaterialTheme.colorScheme.primary,
-        )
+        // 3. Palabra / Referencia Bíblica
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            colors = CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.45f),
+            ),
+            shape = MaterialTheme.shapes.medium,
+        ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 12.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.MenuBook,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.size(20.dp),
+                )
+                Spacer(modifier = Modifier.width(12.dp))
+                Text(
+                    text = devotional.bibleReference,
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onPrimaryContainer,
+                )
+            }
+        }
 
-        Spacer(modifier = Modifier.height(20.dp))
+        Spacer(modifier = Modifier.height(16.dp))
 
-        DetailSection(
+        // 4. Idea Central
+        DetailSectionCard(
             title = stringResource(R.string.detail_central_idea),
             content = devotional.centralIdea,
-            isHighlighted = true,
+            containerColor = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.4f),
+            titleColor = MaterialTheme.colorScheme.primary,
         )
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        DetailSection(
+        // 5. Reflexión
+        DetailSectionCard(
             title = stringResource(R.string.detail_reflection),
             content = devotional.reflection,
+            containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.35f),
+            titleColor = MaterialTheme.colorScheme.primary,
         )
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        DetailSection(
+        // 6. Pregunta personal
+        DetailSectionCard(
             title = stringResource(R.string.detail_personal_question),
             content = devotional.personalQuestion,
+            containerColor = MaterialTheme.colorScheme.tertiaryContainer.copy(alpha = 0.35f),
+            titleColor = MaterialTheme.colorScheme.tertiary,
         )
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        DetailSection(
+        // 7. Oración
+        DetailSectionCard(
             title = stringResource(R.string.detail_prayer_guide),
             content = devotional.prayerGuide,
+            containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.35f),
+            titleColor = MaterialTheme.colorScheme.primary,
         )
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        DetailSection(
+        // 8. Acción para hoy
+        DetailSectionCard(
             title = stringResource(R.string.detail_daily_action),
             content = devotional.dailyAction,
+            containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f),
+            titleColor = MaterialTheme.colorScheme.primary,
         )
 
         Spacer(modifier = Modifier.height(24.dp))
@@ -178,21 +261,19 @@ private fun DevotionalDetailContent(
 }
 
 @Composable
-private fun DetailSection(
+private fun DetailSectionCard(
     title: String,
     content: String,
     modifier: Modifier = Modifier,
-    isHighlighted: Boolean = false,
+    containerColor: androidx.compose.ui.graphics.Color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.35f),
+    titleColor: androidx.compose.ui.graphics.Color = MaterialTheme.colorScheme.primary,
 ) {
     Card(
         modifier = modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(
-            containerColor = if (isHighlighted) {
-                MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.4f)
-            } else {
-                MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.35f)
-            },
+            containerColor = containerColor,
         ),
+        shape = MaterialTheme.shapes.medium,
     ) {
         Column(
             modifier = Modifier
@@ -203,14 +284,81 @@ private fun DetailSection(
                 text = title,
                 style = MaterialTheme.typography.titleSmall,
                 fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.primary,
+                color = titleColor,
             )
-            Spacer(modifier = Modifier.height(6.dp))
+            Spacer(modifier = Modifier.height(8.dp))
             Text(
                 text = content,
                 style = MaterialTheme.typography.bodyLarge,
                 color = MaterialTheme.colorScheme.onSurface,
+                lineHeight = MaterialTheme.typography.bodyLarge.lineHeight,
             )
+        }
+    }
+}
+
+@Composable
+private fun DevotionalDetailBottomBar(
+    previousDevotionalId: String?,
+    nextDevotionalId: String?,
+    onNavigateToDevotional: (String) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Surface(
+        tonalElevation = 3.dp,
+        shadowElevation = 4.dp,
+        color = MaterialTheme.colorScheme.surface,
+        modifier = modifier.fillMaxWidth(),
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 12.dp)
+                .navigationBarsPadding(),
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            OutlinedButton(
+                onClick = {
+                    previousDevotionalId?.let(onNavigateToDevotional)
+                },
+                enabled = previousDevotionalId != null,
+                modifier = Modifier
+                    .weight(1f)
+                    .heightIn(min = 48.dp),
+            ) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                    contentDescription = null,
+                    modifier = Modifier.size(18.dp),
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(
+                    text = stringResource(R.string.action_previous),
+                    style = MaterialTheme.typography.labelLarge,
+                )
+            }
+
+            Button(
+                onClick = {
+                    nextDevotionalId?.let(onNavigateToDevotional)
+                },
+                enabled = nextDevotionalId != null,
+                modifier = Modifier
+                    .weight(1f)
+                    .heightIn(min = 48.dp),
+            ) {
+                Text(
+                    text = stringResource(R.string.action_next),
+                    style = MaterialTheme.typography.labelLarge,
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.ArrowForward,
+                    contentDescription = null,
+                    modifier = Modifier.size(18.dp),
+                )
+            }
         }
     }
 }
@@ -253,7 +401,10 @@ private fun DevotionalNotFoundView(
                 textAlign = TextAlign.Center,
             )
             Spacer(modifier = Modifier.height(20.dp))
-            Button(onClick = onNavigateUp) {
+            Button(
+                onClick = onNavigateUp,
+                modifier = Modifier.heightIn(min = 48.dp),
+            ) {
                 Text(text = stringResource(R.string.action_back))
             }
         }

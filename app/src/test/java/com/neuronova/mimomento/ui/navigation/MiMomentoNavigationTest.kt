@@ -1,4 +1,4 @@
-﻿package com.neuronova.mimomento.ui.navigation
+package com.neuronova.mimomento.ui.navigation
 
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -33,5 +33,17 @@ class MiMomentoNavigationTest {
         assertEquals("devotionals/DEV-0042", route)
         assertTrue(route.startsWith("devotionals/"))
         assertEquals(testId, route.substringAfter("devotionals/"))
+    }
+
+    @Test
+    fun previousAndNextNavigation_generatesExpectedRouteById() {
+        val previousId = "DEV-0041"
+        val nextId = "DEV-0043"
+
+        val previousRoute = MiMomentoDestinations.devotionalDetail(previousId)
+        assertEquals("devotionals/DEV-0041", previousRoute)
+
+        val nextRoute = MiMomentoDestinations.devotionalDetail(nextId)
+        assertEquals("devotionals/DEV-0043", nextRoute)
     }
 }

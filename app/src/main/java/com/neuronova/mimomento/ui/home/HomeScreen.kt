@@ -1,4 +1,4 @@
-﻿package com.neuronova.mimomento.ui.home
+package com.neuronova.mimomento.ui.home
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
@@ -77,7 +78,9 @@ fun HomeScreen(
 
                 Button(
                     onClick = onNavigateToDevotionals,
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .heightIn(min = 48.dp),
                 ) {
                     Text(text = stringResource(R.string.home_cta_devotionals))
                 }

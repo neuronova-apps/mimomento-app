@@ -6,6 +6,10 @@
     <string name="content_error">No se pudo cargar el contenido local</string>
     <string name="action_retry">Reintentar</string>
     <string name="action_back">Volver</string>
+    <string name="action_previous">Anterior</string>
+    <string name="action_next">Siguiente</string>
+    <string name="action_previous_devotional">Devocional anterior</string>
+    <string name="action_next_devotional">Devocional siguiente</string>
 
     <!-- Navigation -->
     <string name="nav_home">Inicio</string>
