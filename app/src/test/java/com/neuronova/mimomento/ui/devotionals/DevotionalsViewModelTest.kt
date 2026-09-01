@@ -123,4 +123,64 @@ class DevotionalsViewModelTest {
         val categoryName = viewModel.getCategoryName("CAT-01")
         assertEquals("Fe", categoryName)
     }
+
+    @Test
+    fun getDevotionalDetailUiState_forFirstDevotional_hasNoPreviousAndHasNextDev0002() {
+        val detailState = viewModel.getDevotionalDetailUiState("DEV-0001")
+        assertNotNull(detailState.devotional)
+        assertEquals("DEV-0001", detailState.devotional?.id)
+        assertEquals("Paz", detailState.categoryName)
+        assertNull(detailState.previousDevotionalId)
+        assertEquals("DEV-0002", detailState.nextDevotionalId)
+        assertEquals(false, detailState.isNotFound)
+    }
+
+    @Test
+    fun getDevotionalDetailUiState_forLastDevotional_hasPreviousDev0359AndHasNoNext() {
+        val detailState = viewModel.getDevotionalDetailUiState("DEV-0360")
+        assertNotNull(detailState.devotional)
+        assertEquals("DEV-0360", detailState.devotional?.id)
+        assertEquals("DEV-0359", detailState.previousDevotionalId)
+        assertNull(detailState.nextDevotionalId)
+        assertEquals(false, detailState.isNotFound)
+    }
+
+    @Test
+    fun getDevotionalDetailUiState_forIntermediateDevotional_resolvesCorrectStateAndNavigation() {
+        val detailState = viewModel.getDevotionalDetailUiState("DEV-0042")
+        assertNotNull(detailState.devotional)
+        assertEquals("DEV-0042", detailState.devotional?.id)
+        assertEquals("DEV-0041", detailState.previousDevotionalId)
+        assertEquals("DEV-0043", detailState.nextDevotionalId)
+        assertEquals(false, detailState.isNotFound)
+        assertTrue(detailState.categoryName.isNotBlank())
+    }
+
+    @Test
+    fun getDevotionalDetailUiState_forNonExistentId_returnsNotFoundStateSafely() {
+        val detailState = viewModel.getDevotionalDetailUiState("DEV-INVALID-NON-EXISTENT")
+        assertNull(detailState.devotional)
+        assertNull(detailState.previousDevotionalId)
+        assertNull(detailState.nextDevotionalId)
+        assertEquals(true, detailState.isNotFound)
+    }
+
+    @Test
+    fun navigationHelpers_returnExpectedIds() {
+        // DEV-0001
+        assertNull(viewModel.getPreviousDevotionalId("DEV-0001"))
+        assertEquals("DEV-0002", viewModel.getNextDevotionalId("DEV-0001"))
+
+        // DEV-0360
+        assertEquals("DEV-0359", viewModel.getPreviousDevotionalId("DEV-0360"))
+        assertNull(viewModel.getNextDevotionalId("DEV-0360"))
+
+        // Intermediate DEV-0042
+        assertEquals("DEV-0041", viewModel.getPreviousDevotionalId("DEV-0042"))
+        assertEquals("DEV-0043", viewModel.getNextDevotionalId("DEV-0042"))
+
+        // Non-existent ID
+        assertNull(viewModel.getPreviousDevotionalId("NON-EXISTENT"))
+        assertNull(viewModel.getNextDevotionalId("NON-EXISTENT"))
+    }
 }

@@ -21,6 +21,18 @@ class MiMomentoContentRepository(
     fun getDevotionalById(id: String): Devotional? =
         loadOnce().content.devotionals.firstOrNull { devotional -> devotional.id == id }
 
+    fun getPreviousDevotionalId(id: String): String? {
+        val devotionals = getAllDevotionals()
+        val index = devotionals.indexOfFirst { it.id == id }
+        return if (index > 0) devotionals[index - 1].id else null
+    }
+
+    fun getNextDevotionalId(id: String): String? {
+        val devotionals = getAllDevotionals()
+        val index = devotionals.indexOfFirst { it.id == id }
+        return if (index in 0 until devotionals.size - 1) devotionals[index + 1].id else null
+    }
+
     fun getCategories(): List<Category> = loadOnce().content.categories
 
     fun getSituations(): List<Situation> = loadOnce().content.situations

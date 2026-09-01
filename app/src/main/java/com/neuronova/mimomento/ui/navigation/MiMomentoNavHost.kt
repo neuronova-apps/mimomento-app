@@ -1,4 +1,4 @@
-﻿package com.neuronova.mimomento.ui.navigation
+package com.neuronova.mimomento.ui.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -71,15 +71,18 @@ fun MiMomentoNavHost(
             val devotionalId = backStackEntry.arguments?.getString(
                 MiMomentoDestinations.DEVOTIONAL_ID_ARG,
             ).orEmpty()
-            val devotional = devotionalsViewModel.getDevotionalById(devotionalId)
-            val categoryName = devotional?.let {
-                devotionalsViewModel.getCategoryName(it.categoryId)
-            }.orEmpty()
+            val detailUiState = devotionalsViewModel.getDevotionalDetailUiState(devotionalId)
 
             DevotionalDetailScreen(
-                devotional = devotional,
-                categoryName = categoryName,
+                uiState = detailUiState,
                 onNavigateUp = { navController.navigateUp() },
+                onNavigateToDevotional = { targetId ->
+                    navController.navigate(MiMomentoDestinations.devotionalDetail(targetId)) {
+                        popUpTo(MiMomentoDestinations.DEVOTIONAL_DETAIL_ROUTE) {
+                            inclusive = true
+                        }
+                    }
+                },
             )
         }
     }
