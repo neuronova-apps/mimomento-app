@@ -4,4 +4,43 @@
     <string name="content_loading">Preparando contenido local…</string>
     <string name="content_available">%1$d devocionales disponibles</string>
     <string name="content_error">No se pudo cargar el contenido local</string>
+    <string name="action_retry">Reintentar</string>
+    <string name="action_back">Volver</string>
+
+    <!-- Navigation -->
+    <string name="nav_home">Inicio</string>
+    <string name="nav_devotionals">Devocionales</string>
+    <string name="nav_prayers">Oraciones</string>
+    <string name="nav_journal">Diario</string>
+    <string name="nav_progress">Progreso</string>
+
+    <!-- Home Screen -->
+    <string name="home_title">Mi Momento</string>
+    <string name="home_subtitle">Pausa, reflexión y oración en tu día</string>
+    <string name="home_cta_devotionals">Ver devocionales</string>
+
+    <!-- Devotionals Screen -->
+    <string name="devotionals_title">Devocionales</string>
+    <string name="filter_all">Todos</string>
+    <string name="devotionals_count_format">%1$d devocionales disponibles</string>
+    <string name="devotional_minutes_format">%1$d min</string>
+    <string name="devotionals_empty">No hay devocionales disponibles en esta categoría</string>
+
+    <!-- Devotional Detail Screen -->
+    <string name="detail_title">Devocional</string>
+    <string name="detail_central_idea">Idea central</string>
+    <string name="detail_reflection">Reflexión</string>
+    <string name="detail_personal_question">Pregunta para reflexionar</string>
+    <string name="detail_prayer_guide">Guía de oración</string>
+    <string name="detail_daily_action">Acción para hoy</string>
+    <string name="detail_not_found_title">Contenido no disponible</string>
+    <string name="detail_not_found_message">El devocional solicitado no se encuentra en el catálogo.</string>
+
+    <!-- Placeholders -->
+    <string name="placeholder_prayers_title">Oraciones</string>
+    <string name="placeholder_prayers_message">Esta sección se habilitará en una siguiente fase.</string>
+    <string name="placeholder_journal_title">Diario</string>
+    <string name="placeholder_journal_message">Esta sección se habilitará en una siguiente fase.</string>
+    <string name="placeholder_progress_title">Progreso</string>
+    <string name="placeholder_progress_message">Esta sección se habilitará en una siguiente fase.</string>
 </resources>
