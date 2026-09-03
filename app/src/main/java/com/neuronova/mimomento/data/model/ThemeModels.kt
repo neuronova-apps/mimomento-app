@@ -67,70 +67,70 @@ object ThemeVisuals {
     )
 
     val DAWN = ThemeVisualDefinition(
-        primary = Color(0xFF945729),
-        secondary = Color(0xFFA66D3D),
-        surface = Color(0xFFFCF8F5),
-        surfaceVariant = Color(0xFFF3E8DE),
-        onSurface = Color(0xFF2B1F17),
-        onBackground = Color(0xFF221711),
-        cardColor = Color(0xF2FFFFFF),
-        borderColor = Color(0x33945729),
-        iconTint = Color(0xFF945729),
-        buttonColor = Color(0xFF945729),
+        primary = Color(0xFF9E4B24),
+        secondary = Color(0xFFC48B47),
+        surface = Color(0xFFFDFBF7),
+        surfaceVariant = Color(0xFFF4ECE4),
+        onSurface = Color(0xFF261A14),
+        onBackground = Color(0xFF1E140E),
+        cardColor = Color(0xEEFDF8F2),
+        borderColor = Color(0x389E4B24),
+        iconTint = Color(0xFF9E4B24),
+        buttonColor = Color(0xFF9E4B24),
         onButtonColor = Color(0xFFFFFFFF),
-        overlayAlpha = 0.85f,
-        scrimColor = Color(0xFFFAF3EC),
+        overlayAlpha = 0.60f,
+        scrimColor = Color(0xFFFAF2EB),
         decorativeAlpha = 0.15f,
     )
 
     val NATURE = ThemeVisualDefinition(
-        primary = Color(0xFF336C4A),
-        secondary = Color(0xFF4B8261),
-        surface = Color(0xFFF5F9F6),
-        surfaceVariant = Color(0xFFE1ECE3),
-        onSurface = Color(0xFF1A261E),
-        onBackground = Color(0xFF131F17),
-        cardColor = Color(0xF2FFFFFF),
-        borderColor = Color(0x33336C4A),
-        iconTint = Color(0xFF336C4A),
-        buttonColor = Color(0xFF336C4A),
+        primary = Color(0xFF2C6445),
+        secondary = Color(0xFF508465),
+        surface = Color(0xFFF3F8F5),
+        surfaceVariant = Color(0xFFDFECE4),
+        onSurface = Color(0xFF14241B),
+        onBackground = Color(0xFF101F16),
+        cardColor = Color(0xEEF2F8F4),
+        borderColor = Color(0x382C6445),
+        iconTint = Color(0xFF2C6445),
+        buttonColor = Color(0xFF2C6445),
         onButtonColor = Color(0xFFFFFFFF),
-        overlayAlpha = 0.85f,
-        scrimColor = Color(0xFFF0F6F2),
+        overlayAlpha = 0.62f,
+        scrimColor = Color(0xFFEFF5F1),
         decorativeAlpha = 0.15f,
     )
 
     val SCRIPTURE = ThemeVisualDefinition(
-        primary = Color(0xFF7A4E38),
-        secondary = Color(0xFF8F624C),
-        surface = Color(0xFFFAF6F2),
-        surfaceVariant = Color(0xFFEFE5DC),
-        onSurface = Color(0xFF291E18),
-        onBackground = Color(0xFF201611),
-        cardColor = Color(0xF2FFFFFF),
-        borderColor = Color(0x337A4E38),
-        iconTint = Color(0xFF7A4E38),
-        buttonColor = Color(0xFF7A4E38),
+        primary = Color(0xFF734934),
+        secondary = Color(0xFF91654C),
+        surface = Color(0xFFFAF6F0),
+        surfaceVariant = Color(0xFFEFE6D9),
+        onSurface = Color(0xFF261C16),
+        onBackground = Color(0xFF1E150F),
+        cardColor = Color(0xEEFAF5ED),
+        borderColor = Color(0x38734934),
+        iconTint = Color(0xFF734934),
+        buttonColor = Color(0xFF734934),
         onButtonColor = Color(0xFFFFFFFF),
-        overlayAlpha = 0.85f,
-        scrimColor = Color(0xFFF7F1EB),
+        overlayAlpha = 0.60f,
+        scrimColor = Color(0xFFF8F3EA),
         decorativeAlpha = 0.15f,
     )
 
     val SERENE = ThemeVisualDefinition(
-        primary = Color(0xFF575283),
-        secondary = Color(0xFF6E6A99),
+        primary = Color(0xFF534C7A),
+        secondary = Color(0xFF736D96),
         surface = Color(0xFFF7F6FA),
-        surfaceVariant = Color(0xFFEBE8F2),
-        onSurface = Color(0xFF211E2D),
-        onBackground = Color(0xFF191624),
-        cardColor = Color(0xF2FFFFFF),
-        borderColor = Color(0x33575283),
-        iconTint = Color(0xFF575283),
-        buttonColor = Color(0xFF575283),
+        surfaceVariant = Color(0xFFE9E6F2),
+        onSurface = Color(0xFF1E1A2B),
+        onBackground = Color(0xFF171422),
+        cardColor = Color(0xEEF5F4FA),
+        borderColor = Color(0x38534C7A),
+        iconTint = Color(0xFF534C7A),
+        buttonColor = Color(0xFF534C7A),
         onButtonColor = Color(0xFFFFFFFF),
-        overlayAlpha = 0.85f,
-        scrimColor = Color(0xFFF3F1F8),
+        overlayAlpha = 0.62f,
+        scrimColor = Color(0xFFF3F1F7),
         decorativeAlpha = 0.15f,
     )
 }
@@ -153,6 +153,7 @@ object MiMomentoThemeCatalog {
         backgroundRes = R.drawable.theme_dawn_bg,
         isPremium = true,
         visual = ThemeVisuals.DAWN,
+        accentStyle = "DAWN_SUNRISE_ACCENT",
     )
 
     val NATURE = MiMomentoThemeDefinition(
@@ -162,6 +163,7 @@ object MiMomentoThemeCatalog {
         backgroundRes = R.drawable.theme_nature_bg,
         isPremium = true,
         visual = ThemeVisuals.NATURE,
+        accentStyle = "NATURE_LEAF_ACCENT",
     )
 
     val SCRIPTURE = MiMomentoThemeDefinition(
@@ -171,6 +173,7 @@ object MiMomentoThemeCatalog {
         backgroundRes = R.drawable.theme_scripture_bg,
         isPremium = true,
         visual = ThemeVisuals.SCRIPTURE,
+        accentStyle = "SCRIPTURE_PARCHMENT_ACCENT",
     )
 
     val SERENE = MiMomentoThemeDefinition(
@@ -180,6 +183,7 @@ object MiMomentoThemeCatalog {
         backgroundRes = R.drawable.theme_serene_bg,
         isPremium = true,
         visual = ThemeVisuals.SERENE,
+        accentStyle = "SERENE_TWILIGHT_ACCENT",
     )
 
     val themes: List<MiMomentoThemeDefinition> = listOf(

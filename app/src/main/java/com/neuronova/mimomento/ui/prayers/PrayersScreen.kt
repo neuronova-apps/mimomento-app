@@ -112,6 +112,8 @@ fun PrayersScreen(
         ModalBottomSheet(
             onDismissRequest = { showHelpSheet = false },
             sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
+            containerColor = LocalActiveTheme.current.visual.cardColor,
+            contentColor = MaterialTheme.colorScheme.onSurface,
         ) {
             PrayersHelpBottomSheetContent(
                 onDismiss = { showHelpSheet = false },

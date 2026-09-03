@@ -1,4 +1,4 @@
-﻿package com.neuronova.mimomento.data.model
+package com.neuronova.mimomento.data.model
 
 import com.neuronova.mimomento.R
 import org.junit.Assert.assertEquals
@@ -90,5 +90,20 @@ class ThemeCatalogTest {
             assertTrue("Overlay alpha must be between 0 and 1", theme.visual.overlayAlpha in 0f..1f)
             assertTrue("Decorative alpha must be between 0 and 1", theme.visual.decorativeAlpha in 0f..1f)
         }
+    }
+
+    @Test
+    fun allThemes_haveUniqueAccentStylesConfigured() {
+        assertEquals("SKY_CELESTIAL_ACCENT", MiMomentoThemeCatalog.SKY.accentStyle)
+        assertEquals("DAWN_SUNRISE_ACCENT", MiMomentoThemeCatalog.DAWN.accentStyle)
+        assertEquals("NATURE_LEAF_ACCENT", MiMomentoThemeCatalog.NATURE.accentStyle)
+        assertEquals("SCRIPTURE_PARCHMENT_ACCENT", MiMomentoThemeCatalog.SCRIPTURE.accentStyle)
+        assertEquals("SERENE_TWILIGHT_ACCENT", MiMomentoThemeCatalog.SERENE.accentStyle)
+    }
+
+    @Test
+    fun allThemes_haveDistinctCardColors() {
+        val cardColors = MiMomentoThemeCatalog.themes.map { it.visual.cardColor }.toSet()
+        assertEquals("Each theme must have its own distinct cardColor", 5, cardColors.size)
     }
 }
