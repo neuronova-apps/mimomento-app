@@ -1,4 +1,4 @@
-﻿package com.neuronova.mimomento.ui.app
+package com.neuronova.mimomento.ui.app
 
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -28,6 +28,8 @@ import com.neuronova.mimomento.ui.devotionals.DevotionalsViewModel
 import com.neuronova.mimomento.ui.navigation.MiMomentoDestinations
 import com.neuronova.mimomento.ui.navigation.MiMomentoNavHost
 import com.neuronova.mimomento.ui.navigation.TOP_LEVEL_DESTINATIONS
+import com.neuronova.mimomento.ui.navigation.shouldShowBottomBar
+import com.neuronova.mimomento.ui.prayers.PrayersViewModel
 
 @Composable
 fun MiMomentoApp(
@@ -38,6 +40,9 @@ fun MiMomentoApp(
     ),
     devotionalsViewModel: DevotionalsViewModel = viewModel(
         factory = DevotionalsViewModel.provideFactory(repository),
+    ),
+    prayersViewModel: PrayersViewModel = viewModel(
+        factory = PrayersViewModel.provideFactory(repository),
     ),
     navController: NavHostController = rememberNavController(),
 ) {
@@ -60,38 +65,41 @@ fun MiMomentoApp(
                 is AppContentUiState.Ready -> {
                     val navBackStackEntry by navController.currentBackStackEntryAsState()
                     val currentDestination = navBackStackEntry?.destination
+                    val showBottomBar = shouldShowBottomBar(currentDestination?.route)
 
                     Scaffold(
                         bottomBar = {
-                            NavigationBar {
-                                TOP_LEVEL_DESTINATIONS.forEach { topLevel ->
-                                    val isSelected = currentDestination?.hierarchy?.any {
-                                        it.route == topLevel.route
-                                    } == true
+                            if (showBottomBar) {
+                                NavigationBar {
+                                    TOP_LEVEL_DESTINATIONS.forEach { topLevel ->
+                                        val isSelected = currentDestination?.hierarchy?.any {
+                                            it.route == topLevel.route
+                                        } == true
 
-                                    NavigationBarItem(
-                                        selected = isSelected,
-                                        onClick = {
-                                            navController.navigate(topLevel.route) {
-                                                popUpTo(navController.graph.findStartDestination().id) {
-                                                    saveState = true
+                                        NavigationBarItem(
+                                            selected = isSelected,
+                                            onClick = {
+                                                navController.navigate(topLevel.route) {
+                                                    popUpTo(MiMomentoDestinations.HOME) {
+                                                        saveState = true
+                                                    }
+                                                    launchSingleTop = true
+                                                    restoreState = true
                                                 }
-                                                launchSingleTop = true
-                                                restoreState = true
-                                            }
-                                        },
-                                        icon = {
-                                            Icon(
-                                                imageVector = topLevel.icon,
-                                                contentDescription = stringResource(
-                                                    topLevel.contentDescriptionRes,
-                                                ),
-                                            )
-                                        },
-                                        label = {
-                                            Text(text = stringResource(topLevel.labelRes))
-                                        },
-                                    )
+                                            },
+                                            icon = {
+                                                Icon(
+                                                    imageVector = topLevel.icon,
+                                                    contentDescription = stringResource(
+                                                        topLevel.contentDescriptionRes,
+                                                    ),
+                                                )
+                                            },
+                                            label = {
+                                                Text(text = stringResource(topLevel.labelRes))
+                                            },
+                                        )
+                                    }
                                 }
                             }
                         },
@@ -99,10 +107,11 @@ fun MiMomentoApp(
                         MiMomentoNavHost(
                             navController = navController,
                             devotionalsViewModel = devotionalsViewModel,
+                            prayersViewModel = prayersViewModel,
                             devotionalCount = state.devotionalCount,
                             onNavigateToDevotionals = {
                                 navController.navigate(MiMomentoDestinations.DEVOTIONALS) {
-                                    popUpTo(navController.graph.findStartDestination().id) {
+                                    popUpTo(MiMomentoDestinations.HOME) {
                                         saveState = true
                                     }
                                     launchSingleTop = true

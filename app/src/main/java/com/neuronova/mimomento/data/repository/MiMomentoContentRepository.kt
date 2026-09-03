@@ -4,7 +4,11 @@ import com.neuronova.mimomento.data.local.LoadedMiMomentoContent
 import com.neuronova.mimomento.data.local.MiMomentoContentSource
 import com.neuronova.mimomento.data.model.Category
 import com.neuronova.mimomento.data.model.Devotional
+import com.neuronova.mimomento.data.model.PrayerGuide
+import com.neuronova.mimomento.data.model.PrayerRoute
 import com.neuronova.mimomento.data.model.Situation
+import com.neuronova.mimomento.data.model.SpecialContext
+import com.neuronova.mimomento.data.model.SpiritualMoment
 import com.neuronova.mimomento.data.model.Subtheme
 import com.neuronova.mimomento.data.model.TagDefinition
 import com.neuronova.mimomento.data.validation.MiMomentoContentValidator
@@ -40,6 +44,33 @@ class MiMomentoContentRepository(
     fun getSubthemes(): List<Subtheme> = loadOnce().content.subthemes
 
     fun getTags(): List<TagDefinition> = loadOnce().content.tags
+
+    fun getSpiritualMoments(): List<SpiritualMoment> = loadOnce().content.spiritualMoments
+
+    fun getSpiritualMomentById(id: String): SpiritualMoment? =
+        loadOnce().content.spiritualMoments.firstOrNull { it.id == id }
+
+    fun getPrayerRoutes(): List<PrayerRoute> = loadOnce().content.prayerRoutes
+
+    fun getPrayerRouteById(id: String): PrayerRoute? =
+        loadOnce().content.prayerRoutes.firstOrNull { it.id == id }
+
+    fun getPrayerGuides(): List<PrayerGuide> = loadOnce().content.prayerGuides
+
+    fun getPrayerGuideById(id: String): PrayerGuide? =
+        loadOnce().content.prayerGuides.firstOrNull { it.id == id }
+
+    fun getSpecialContexts(): List<SpecialContext> = loadOnce().content.specialContexts
+
+    fun getSpecialContextById(id: String): SpecialContext? =
+        loadOnce().content.specialContexts.firstOrNull { it.id == id }
+
+    fun getSuggestedDevotional(situationIds: List<String>, categoryIds: List<String>): Devotional? =
+        DevotionalSuggestionResolver.resolve(
+            situationIds = situationIds,
+            categoryIds = categoryIds,
+            devotionals = getAllDevotionals(),
+        )
 
     fun validate(validator: MiMomentoContentValidator): ValidationResult {
         val loaded = loadOnce()

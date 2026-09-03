@@ -14,26 +14,83 @@ import com.neuronova.mimomento.ui.devotionals.DevotionalsScreen
 import com.neuronova.mimomento.ui.devotionals.DevotionalsViewModel
 import com.neuronova.mimomento.ui.home.HomeScreen
 import com.neuronova.mimomento.ui.journal.JournalScreen
+import com.neuronova.mimomento.ui.prayers.PrayerGuideDetailScreen
+import com.neuronova.mimomento.ui.prayers.PrayerRouteDetailScreen
 import com.neuronova.mimomento.ui.prayers.PrayersScreen
+import com.neuronova.mimomento.ui.prayers.PrayersViewModel
+import com.neuronova.mimomento.ui.prayers.SpiritualMomentDetailScreen
 import com.neuronova.mimomento.ui.progress.ProgressScreen
+import com.neuronova.mimomento.ui.settings.SettingsScreen
+import com.neuronova.mimomento.ui.welcome.WelcomeScreen
 
 @Composable
 fun MiMomentoNavHost(
     navController: NavHostController,
     devotionalsViewModel: DevotionalsViewModel,
+    prayersViewModel: PrayersViewModel,
     devotionalCount: Int,
     onNavigateToDevotionals: () -> Unit,
     modifier: Modifier = Modifier,
+    startDestination: String = MiMomentoDestinations.START_DESTINATION,
 ) {
     NavHost(
         navController = navController,
-        startDestination = MiMomentoDestinations.HOME,
+        startDestination = startDestination,
         modifier = modifier,
     ) {
+        composable(route = MiMomentoDestinations.WELCOME) {
+            WelcomeScreen(
+                onStart = {
+                    navController.navigate(MiMomentoDestinations.HOME) {
+                        popUpTo(MiMomentoDestinations.WELCOME) {
+                            inclusive = true
+                        }
+                        launchSingleTop = true
+                    }
+                },
+            )
+        }
+
         composable(route = MiMomentoDestinations.HOME) {
             HomeScreen(
-                devotionalCount = devotionalCount,
                 onNavigateToDevotionals = onNavigateToDevotionals,
+                onNavigateToPrayers = {
+                    navController.navigate(MiMomentoDestinations.PRAYERS) {
+                        popUpTo(MiMomentoDestinations.HOME) {
+                            saveState = true
+                        }
+                        launchSingleTop = true
+                        restoreState = true
+                    }
+                },
+                onNavigateToJournal = {
+                    navController.navigate(MiMomentoDestinations.JOURNAL) {
+                        popUpTo(MiMomentoDestinations.HOME) {
+                            saveState = true
+                        }
+                        launchSingleTop = true
+                        restoreState = true
+                    }
+                },
+                onNavigateToProgress = {
+                    navController.navigate(MiMomentoDestinations.PROGRESS) {
+                        popUpTo(MiMomentoDestinations.HOME) {
+                            saveState = true
+                        }
+                        launchSingleTop = true
+                        restoreState = true
+                    }
+                },
+                onNavigateToSettings = {
+                    navController.navigate(MiMomentoDestinations.SETTINGS)
+                },
+                devotionalCount = devotionalCount,
+            )
+        }
+
+        composable(route = MiMomentoDestinations.SETTINGS) {
+            SettingsScreen(
+                onNavigateUp = { navController.navigateUp() },
             )
         }
 
@@ -49,7 +106,20 @@ fun MiMomentoNavHost(
         }
 
         composable(route = MiMomentoDestinations.PRAYERS) {
-            PrayersScreen()
+            val uiState by prayersViewModel.uiState.collectAsState()
+            PrayersScreen(
+                uiState = uiState,
+                onSelectSection = prayersViewModel::selectSection,
+                onMomentClick = { momentId ->
+                    navController.navigate(MiMomentoDestinations.spiritualMomentDetail(momentId))
+                },
+                onRouteClick = { routeId ->
+                    navController.navigate(MiMomentoDestinations.prayerRouteDetail(routeId))
+                },
+                onGuideClick = { guideId ->
+                    navController.navigate(MiMomentoDestinations.prayerGuideDetail(guideId))
+                },
+            )
         }
 
         composable(route = MiMomentoDestinations.JOURNAL) {
@@ -82,6 +152,80 @@ fun MiMomentoNavHost(
                             inclusive = true
                         }
                     }
+                },
+                onFinishDevotional = {
+                    navController.navigate(MiMomentoDestinations.PRAYERS) {
+                        popUpTo(MiMomentoDestinations.HOME) {
+                            inclusive = false
+                        }
+                        launchSingleTop = true
+                    }
+                },
+            )
+        }
+
+        composable(
+            route = MiMomentoDestinations.PRAYER_GUIDE_DETAIL_ROUTE,
+            arguments = listOf(
+                navArgument(MiMomentoDestinations.PRAYER_GUIDE_ID_ARG) {
+                    type = NavType.StringType
+                },
+            ),
+        ) { backStackEntry ->
+            val guideId = backStackEntry.arguments?.getString(
+                MiMomentoDestinations.PRAYER_GUIDE_ID_ARG,
+            ).orEmpty()
+            val detailUiState = prayersViewModel.getGuideDetailUiState(guideId)
+
+            PrayerGuideDetailScreen(
+                uiState = detailUiState,
+                onNavigateUp = { navController.navigateUp() },
+                onNavigateToDevotional = { devotionalId ->
+                    navController.navigate(MiMomentoDestinations.devotionalDetail(devotionalId))
+                },
+            )
+        }
+
+        composable(
+            route = MiMomentoDestinations.PRAYER_ROUTE_DETAIL_ROUTE,
+            arguments = listOf(
+                navArgument(MiMomentoDestinations.PRAYER_ROUTE_ID_ARG) {
+                    type = NavType.StringType
+                },
+            ),
+        ) { backStackEntry ->
+            val routeId = backStackEntry.arguments?.getString(
+                MiMomentoDestinations.PRAYER_ROUTE_ID_ARG,
+            ).orEmpty()
+
+            PrayerRouteDetailScreen(
+                routeId = routeId,
+                prayersViewModel = prayersViewModel,
+                onNavigateUp = { navController.navigateUp() },
+                onNavigateToDevotional = { devotionalId ->
+                    navController.navigate(MiMomentoDestinations.devotionalDetail(devotionalId))
+                },
+            )
+        }
+
+        composable(
+            route = MiMomentoDestinations.SPIRITUAL_MOMENT_DETAIL_ROUTE,
+            arguments = listOf(
+                navArgument(MiMomentoDestinations.SPIRITUAL_MOMENT_ID_ARG) {
+                    type = NavType.StringType
+                },
+            ),
+        ) { backStackEntry ->
+            val momentId = backStackEntry.arguments?.getString(
+                MiMomentoDestinations.SPIRITUAL_MOMENT_ID_ARG,
+            ).orEmpty()
+            val detailUiState = prayersViewModel.getSpiritualMomentDetailUiState(momentId)
+
+            SpiritualMomentDetailScreen(
+                uiState = detailUiState,
+                onNavigateUp = { navController.navigateUp() },
+                onNavigateToDevotional = { devotionalId ->
+                    navController.navigate(MiMomentoDestinations.devotionalDetail(devotionalId))
                 },
             )
         }

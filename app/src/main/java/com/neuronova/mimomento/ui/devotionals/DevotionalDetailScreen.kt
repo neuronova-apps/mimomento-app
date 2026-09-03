@@ -20,6 +20,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.automirrored.filled.MenuBook
 import androidx.compose.material.icons.filled.Info
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -34,6 +35,10 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -49,10 +54,12 @@ fun DevotionalDetailScreen(
     uiState: DevotionalDetailUiState,
     onNavigateUp: () -> Unit,
     onNavigateToDevotional: (String) -> Unit = {},
+    onFinishDevotional: () -> Unit = {},
     modifier: Modifier = Modifier,
 ) {
     val devotional = uiState.devotional
     val isNotFound = uiState.isNotFound || devotional == null
+    var showFinishDialog by rememberSaveable { mutableStateOf(false) }
 
     Scaffold(
         modifier = modifier.fillMaxSize(),
@@ -97,9 +104,48 @@ fun DevotionalDetailScreen(
             DevotionalDetailContent(
                 devotional = devotional!!,
                 categoryName = uiState.categoryName,
+                onFinishClick = { showFinishDialog = true },
                 modifier = Modifier.padding(innerPadding),
             )
         }
+    }
+
+    if (showFinishDialog) {
+        AlertDialog(
+            onDismissRequest = { showFinishDialog = false },
+            title = {
+                Text(
+                    text = stringResource(R.string.devotional_completed_title),
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                )
+            },
+            text = {
+                Text(
+                    text = stringResource(R.string.devotional_completed_message),
+                    style = MaterialTheme.typography.bodyMedium,
+                )
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        showFinishDialog = false
+                        onFinishDevotional()
+                    },
+                    modifier = Modifier.heightIn(min = 48.dp),
+                ) {
+                    Text(text = stringResource(R.string.devotional_back_to_prayers))
+                }
+            },
+            dismissButton = {
+                OutlinedButton(
+                    onClick = { showFinishDialog = false },
+                    modifier = Modifier.heightIn(min = 48.dp),
+                ) {
+                    Text(text = stringResource(R.string.devotional_continue_here))
+                }
+            },
+        )
     }
 }
 
@@ -109,6 +155,7 @@ fun DevotionalDetailScreen(
     categoryName: String,
     onNavigateUp: () -> Unit,
     onNavigateToDevotional: (String) -> Unit = {},
+    onFinishDevotional: () -> Unit = {},
     modifier: Modifier = Modifier,
 ) {
     DevotionalDetailScreen(
@@ -119,6 +166,7 @@ fun DevotionalDetailScreen(
         ),
         onNavigateUp = onNavigateUp,
         onNavigateToDevotional = onNavigateToDevotional,
+        onFinishDevotional = onFinishDevotional,
         modifier = modifier,
     )
 }
@@ -127,6 +175,7 @@ fun DevotionalDetailScreen(
 private fun DevotionalDetailContent(
     devotional: Devotional,
     categoryName: String,
+    onFinishClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val scrollState = rememberScrollState()
@@ -255,6 +304,22 @@ private fun DevotionalDetailContent(
             containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f),
             titleColor = MaterialTheme.colorScheme.primary,
         )
+
+        Spacer(modifier = Modifier.height(24.dp))
+
+        // 9. Finalizar devocional
+        Button(
+            onClick = onFinishClick,
+            modifier = Modifier
+                .fillMaxWidth()
+                .heightIn(min = 48.dp),
+        ) {
+            Text(
+                text = stringResource(R.string.devotional_finish),
+                style = MaterialTheme.typography.labelLarge,
+                fontWeight = FontWeight.SemiBold,
+            )
+        }
 
         Spacer(modifier = Modifier.height(24.dp))
     }
