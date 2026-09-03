@@ -198,4 +198,42 @@ class MiMomentoNavigationTest {
         onFinishDevotional()
         assertTrue(devotionalFinished)
     }
+
+    @Test
+    fun themesRoute_isCanonicalAndNotTopLevelTab() {
+        assertEquals("settings/themes", MiMomentoDestinations.THEMES)
+        assertTrue(
+            "Themes must NOT be in top-level bottom navigation destinations",
+            TOP_LEVEL_DESTINATIONS.none { it.route == MiMomentoDestinations.THEMES },
+        )
+    }
+
+    @Test
+    fun themesScreen_suppressesBottomNavigationBar() {
+        assertTrue(
+            "Themes route must hide bottom navigation bar",
+            !shouldShowBottomBar(MiMomentoDestinations.THEMES),
+        )
+    }
+
+    @Test
+    fun settingsToThemes_operatesOnStandardBackStack() {
+        val backStack = mutableListOf(MiMomentoDestinations.HOME, MiMomentoDestinations.SETTINGS)
+        // User taps theme row in Settings:
+        backStack.add(MiMomentoDestinations.THEMES)
+        assertEquals(
+            listOf(MiMomentoDestinations.HOME, MiMomentoDestinations.SETTINGS, MiMomentoDestinations.THEMES),
+            backStack,
+        )
+        assertTrue("Themes suppresses bottom bar", !shouldShowBottomBar(backStack.last()))
+
+        // User presses back from Themes:
+        backStack.removeAt(backStack.size - 1)
+        assertEquals(listOf(MiMomentoDestinations.HOME, MiMomentoDestinations.SETTINGS), backStack)
+
+        // User presses back from Settings:
+        backStack.removeAt(backStack.size - 1)
+        assertEquals(listOf(MiMomentoDestinations.HOME), backStack)
+        assertTrue("Home shows bottom bar", shouldShowBottomBar(backStack.last()))
+    }
 }

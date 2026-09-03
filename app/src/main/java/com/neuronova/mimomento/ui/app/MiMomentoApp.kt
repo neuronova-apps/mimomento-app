@@ -12,6 +12,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -20,7 +23,11 @@ import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.neuronova.mimomento.data.model.MiMomentoThemeCatalog
+import com.neuronova.mimomento.data.repository.DefaultThemeAvailabilityPolicy
 import com.neuronova.mimomento.data.repository.MiMomentoContentRepository
+import com.neuronova.mimomento.data.repository.ThemeAvailabilityPolicy
+import com.neuronova.mimomento.data.repository.ThemePreferencesRepository
 import com.neuronova.mimomento.data.validation.MiMomentoContentValidator
 import com.neuronova.mimomento.ui.components.ErrorView
 import com.neuronova.mimomento.ui.components.LoadingView
@@ -30,10 +37,17 @@ import com.neuronova.mimomento.ui.navigation.MiMomentoNavHost
 import com.neuronova.mimomento.ui.navigation.TOP_LEVEL_DESTINATIONS
 import com.neuronova.mimomento.ui.navigation.shouldShowBottomBar
 import com.neuronova.mimomento.ui.prayers.PrayersViewModel
+import com.neuronova.mimomento.ui.theme.MiMomentoTheme
+import com.neuronova.mimomento.ui.theme.ThemedBackground
+import com.neuronova.mimomento.ui.theme.ThemeUiState
+import com.neuronova.mimomento.ui.theme.ThemeViewModel
 
 @Composable
 fun MiMomentoApp(
     repository: MiMomentoContentRepository,
+    themeRepository: ThemePreferencesRepository? = null,
+    availabilityPolicy: ThemeAvailabilityPolicy = DefaultThemeAvailabilityPolicy(),
+    previewPolicy: com.neuronova.mimomento.data.repository.DebugThemePreviewPolicy = com.neuronova.mimomento.data.repository.DefaultDebugThemePreviewPolicy(),
     validator: MiMomentoContentValidator = MiMomentoContentValidator(),
     appContentViewModel: AppContentViewModel = viewModel(
         factory = AppContentViewModel.provideFactory(repository, validator),
@@ -44,12 +58,19 @@ fun MiMomentoApp(
     prayersViewModel: PrayersViewModel = viewModel(
         factory = PrayersViewModel.provideFactory(repository),
     ),
+    themeViewModel: ThemeViewModel? = themeRepository?.let {
+        viewModel(factory = ThemeViewModel.provideFactory(it, availabilityPolicy, previewPolicy))
+    },
     navController: NavHostController = rememberNavController(),
 ) {
     val contentState by appContentViewModel.uiState.collectAsState()
+    val themeUiState by themeViewModel?.uiState?.collectAsState() ?: remember {
+        mutableStateOf(ThemeUiState())
+    }
+    val activeTheme = themeUiState.activeTheme
 
-    MaterialTheme {
-        Surface(modifier = Modifier.fillMaxSize()) {
+    MiMomentoTheme(theme = activeTheme) {
+        ThemedBackground(theme = activeTheme) {
             when (val state = contentState) {
                 AppContentUiState.Loading -> {
                     LoadingView()
@@ -68,9 +89,12 @@ fun MiMomentoApp(
                     val showBottomBar = shouldShowBottomBar(currentDestination?.route)
 
                     Scaffold(
+                        containerColor = Color.Transparent,
                         bottomBar = {
                             if (showBottomBar) {
-                                NavigationBar {
+                                NavigationBar(
+                                    containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.95f),
+                                ) {
                                     TOP_LEVEL_DESTINATIONS.forEach { topLevel ->
                                         val isSelected = currentDestination?.hierarchy?.any {
                                             it.route == topLevel.route
@@ -108,6 +132,7 @@ fun MiMomentoApp(
                             navController = navController,
                             devotionalsViewModel = devotionalsViewModel,
                             prayersViewModel = prayersViewModel,
+                            themeViewModel = themeViewModel,
                             devotionalCount = state.devotionalCount,
                             onNavigateToDevotionals = {
                                 navController.navigate(MiMomentoDestinations.DEVOTIONALS) {
