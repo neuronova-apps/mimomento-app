@@ -57,6 +57,11 @@ import com.neuronova.mimomento.data.model.Devotional
 import com.neuronova.mimomento.data.model.PrayerGuide
 import com.neuronova.mimomento.data.model.PrayerRoute
 import com.neuronova.mimomento.data.model.SpiritualMoment
+import com.neuronova.mimomento.ui.theme.LocalActiveTheme
+import com.neuronova.mimomento.ui.theme.ThemedCardAccentLine
+import com.neuronova.mimomento.ui.theme.themedCardBorder
+import com.neuronova.mimomento.ui.theme.themedCardColors
+import com.neuronova.mimomento.ui.theme.themedTopAppBarColors
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -91,6 +96,7 @@ fun PrayerGuideDetailScreen(
                         )
                     }
                 },
+                colors = themedTopAppBarColors(),
             )
         },
     ) { innerPadding ->
@@ -289,6 +295,7 @@ fun PrayerRouteDetailScreen(
                             )
                         }
                     },
+                    colors = themedTopAppBarColors(),
                 )
             },
         ) { innerPadding ->
@@ -338,6 +345,7 @@ fun PrayerRouteDetailScreen(
                             )
                         }
                     },
+                    colors = themedTopAppBarColors(),
                 )
             },
             bottomBar = {
@@ -502,6 +510,7 @@ private fun PrayerRouteCompletionContent(
                         )
                     }
                 },
+                colors = themedTopAppBarColors(),
             )
         },
     ) { innerPadding ->
@@ -605,6 +614,7 @@ fun SpiritualMomentDetailScreen(
                         )
                     }
                 },
+                colors = themedTopAppBarColors(),
             )
         },
     ) { innerPadding ->
@@ -753,12 +763,12 @@ fun SuggestedDevotionalCard(
                     role = Role.Button,
                     onClick = { onDevotionalClick(devotional.id) },
                 ),
-            colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.45f),
-            ),
+            colors = themedCardColors(),
+            border = themedCardBorder(),
             shape = MaterialTheme.shapes.medium,
-            elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
+            elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
         ) {
+            ThemedCardAccentLine()
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -845,7 +855,7 @@ private fun PrayerSectionCard(
     title: String,
     content: String,
     modifier: Modifier = Modifier,
-    containerColor: Color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.35f),
+    containerColor: Color = LocalActiveTheme.current.visual.cardColor,
     titleColor: Color = MaterialTheme.colorScheme.primary,
 ) {
     Card(
@@ -853,8 +863,10 @@ private fun PrayerSectionCard(
         colors = CardDefaults.cardColors(
             containerColor = containerColor,
         ),
+        border = themedCardBorder(),
         shape = MaterialTheme.shapes.medium,
     ) {
+        ThemedCardAccentLine(alpha = 0.35f)
         Column(
             modifier = Modifier
                 .fillMaxWidth()

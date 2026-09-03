@@ -26,6 +26,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.neuronova.mimomento.R
+import com.neuronova.mimomento.ui.theme.LocalActiveTheme
+import com.neuronova.mimomento.ui.theme.themedCardBorder
 
 @Composable
 fun WelcomeScreen(
@@ -132,6 +134,7 @@ private fun BrandMark() {
         shape = MaterialTheme.shapes.extraLarge,
         color = MaterialTheme.colorScheme.primaryContainer,
         contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+        border = themedCardBorder(),
         tonalElevation = 2.dp,
     ) {
         Box(contentAlignment = Alignment.Center) {
@@ -153,7 +156,8 @@ private fun WelcomeChip(
     Surface(
         modifier = modifier,
         shape = MaterialTheme.shapes.large,
-        color = MaterialTheme.colorScheme.surfaceVariant,
+        color = LocalActiveTheme.current.visual.cardColor,
+        border = themedCardBorder(),
     ) {
         Text(
             text = text,

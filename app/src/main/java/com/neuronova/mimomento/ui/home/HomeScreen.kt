@@ -39,6 +39,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.neuronova.mimomento.R
+import com.neuronova.mimomento.ui.theme.ThemedCardAccentLine
+import com.neuronova.mimomento.ui.theme.themedCardBorder
+import com.neuronova.mimomento.ui.theme.themedCardColors
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -172,10 +175,10 @@ fun HomeScreen(
                         .weight(1f)
                         .heightIn(min = 72.dp),
                     shape = MaterialTheme.shapes.medium,
-                    colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.6f),
-                    ),
+                    colors = themedCardColors(),
+                    border = themedCardBorder(),
                 ) {
+                    ThemedCardAccentLine()
                     Column(
                         modifier = Modifier
                             .fillMaxSize()
@@ -205,10 +208,10 @@ fun HomeScreen(
                         .weight(1f)
                         .heightIn(min = 72.dp),
                     shape = MaterialTheme.shapes.medium,
-                    colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.6f),
-                    ),
+                    colors = themedCardColors(),
+                    border = themedCardBorder(),
                 ) {
+                    ThemedCardAccentLine()
                     Column(
                         modifier = Modifier
                             .fillMaxSize()

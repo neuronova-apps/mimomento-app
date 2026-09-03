@@ -19,6 +19,7 @@ object MiMomentoDestinations {
     const val JOURNAL = "journal"
     const val PROGRESS = "progress"
     const val SETTINGS = "settings"
+    const val THEMES = "settings/themes"
     const val DEVOTIONAL_ID_ARG = "devotionalId"
     const val DEVOTIONAL_DETAIL_ROUTE = "devotionals/{$DEVOTIONAL_ID_ARG}"
 
@@ -79,5 +80,7 @@ val TOP_LEVEL_DESTINATIONS = listOf(
 
 fun shouldShowBottomBar(route: String?): Boolean {
     if (route == null) return false
-    return route != MiMomentoDestinations.WELCOME && route != MiMomentoDestinations.SETTINGS
+    return route != MiMomentoDestinations.WELCOME &&
+        route != MiMomentoDestinations.SETTINGS &&
+        route != MiMomentoDestinations.THEMES
 }

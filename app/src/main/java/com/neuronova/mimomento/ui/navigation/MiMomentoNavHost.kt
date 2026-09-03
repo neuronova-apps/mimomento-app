@@ -12,6 +12,7 @@ import androidx.navigation.navArgument
 import com.neuronova.mimomento.ui.devotionals.DevotionalDetailScreen
 import com.neuronova.mimomento.ui.devotionals.DevotionalsScreen
 import com.neuronova.mimomento.ui.devotionals.DevotionalsViewModel
+import androidx.compose.ui.res.stringResource
 import com.neuronova.mimomento.ui.home.HomeScreen
 import com.neuronova.mimomento.ui.journal.JournalScreen
 import com.neuronova.mimomento.ui.prayers.PrayerGuideDetailScreen
@@ -21,6 +22,8 @@ import com.neuronova.mimomento.ui.prayers.PrayersViewModel
 import com.neuronova.mimomento.ui.prayers.SpiritualMomentDetailScreen
 import com.neuronova.mimomento.ui.progress.ProgressScreen
 import com.neuronova.mimomento.ui.settings.SettingsScreen
+import com.neuronova.mimomento.ui.settings.ThemesScreen
+import com.neuronova.mimomento.ui.theme.ThemeViewModel
 import com.neuronova.mimomento.ui.welcome.WelcomeScreen
 
 @Composable
@@ -32,6 +35,7 @@ fun MiMomentoNavHost(
     onNavigateToDevotionals: () -> Unit,
     modifier: Modifier = Modifier,
     startDestination: String = MiMomentoDestinations.START_DESTINATION,
+    themeViewModel: ThemeViewModel? = null,
 ) {
     NavHost(
         navController = navController,
@@ -89,9 +93,24 @@ fun MiMomentoNavHost(
         }
 
         composable(route = MiMomentoDestinations.SETTINGS) {
+            val currentThemeName = themeViewModel?.uiState?.collectAsState()?.value?.selectedTheme?.let {
+                stringResource(it.nameRes)
+            } ?: stringResource(com.neuronova.mimomento.R.string.theme_sky)
+
             SettingsScreen(
                 onNavigateUp = { navController.navigateUp() },
+                onNavigateToThemes = { navController.navigate(MiMomentoDestinations.THEMES) },
+                currentThemeName = currentThemeName,
             )
+        }
+
+        composable(route = MiMomentoDestinations.THEMES) {
+            if (themeViewModel != null) {
+                ThemesScreen(
+                    themeViewModel = themeViewModel,
+                    onNavigateUp = { navController.navigateUp() },
+                )
+            }
         }
 
         composable(route = MiMomentoDestinations.DEVOTIONALS) {
