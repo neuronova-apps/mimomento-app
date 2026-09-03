@@ -11,15 +11,30 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import com.neuronova.mimomento.R
 
 object MiMomentoDestinations {
+    const val WELCOME = "welcome"
+    const val START_DESTINATION = WELCOME
     const val HOME = "home"
     const val DEVOTIONALS = "devotionals"
     const val PRAYERS = "prayers"
     const val JOURNAL = "journal"
     const val PROGRESS = "progress"
+    const val SETTINGS = "settings"
     const val DEVOTIONAL_ID_ARG = "devotionalId"
     const val DEVOTIONAL_DETAIL_ROUTE = "devotionals/{$DEVOTIONAL_ID_ARG}"
 
     fun devotionalDetail(devotionalId: String): String = "devotionals/$devotionalId"
+
+    const val PRAYER_GUIDE_ID_ARG = "guideId"
+    const val PRAYER_GUIDE_DETAIL_ROUTE = "prayers/guide/{$PRAYER_GUIDE_ID_ARG}"
+    fun prayerGuideDetail(guideId: String): String = "prayers/guide/$guideId"
+
+    const val PRAYER_ROUTE_ID_ARG = "routeId"
+    const val PRAYER_ROUTE_DETAIL_ROUTE = "prayers/route/{$PRAYER_ROUTE_ID_ARG}"
+    fun prayerRouteDetail(routeId: String): String = "prayers/route/$routeId"
+
+    const val SPIRITUAL_MOMENT_ID_ARG = "momentId"
+    const val SPIRITUAL_MOMENT_DETAIL_ROUTE = "prayers/moment/{$SPIRITUAL_MOMENT_ID_ARG}"
+    fun spiritualMomentDetail(momentId: String): String = "prayers/moment/$momentId"
 }
 
 data class TopLevelDestination(
@@ -61,3 +76,8 @@ val TOP_LEVEL_DESTINATIONS = listOf(
         contentDescriptionRes = R.string.nav_progress,
     ),
 )
+
+fun shouldShowBottomBar(route: String?): Boolean {
+    if (route == null) return false
+    return route != MiMomentoDestinations.WELCOME && route != MiMomentoDestinations.SETTINGS
+}

@@ -66,4 +66,66 @@ class MiMomentoContentRepositoryTest {
         assertNull(repository.getPreviousDevotionalId("DEV-INVALID-9999"))
         assertNull(repository.getNextDevotionalId("DEV-INVALID-9999"))
     }
+
+    @Test
+    fun spiritualMoments_loadedAndAccessible() {
+        val repository = MiMomentoContentRepository(
+            source = MiMomentoContentSource { TestContentFixture.loaded },
+        )
+        val moments = repository.getSpiritualMoments()
+        assertEquals(8, moments.size)
+        val me01 = repository.getSpiritualMomentById("ME-01")
+        assertEquals("ME-01", me01?.id)
+        assertEquals("Al despertar", me01?.label)
+        assertNull(repository.getSpiritualMomentById("ME-9999"))
+    }
+
+    @Test
+    fun prayerRoutes_loadedAndAccessible() {
+        val repository = MiMomentoContentRepository(
+            source = MiMomentoContentSource { TestContentFixture.loaded },
+        )
+        val routes = repository.getPrayerRoutes()
+        assertEquals(4, routes.size)
+        val ro01 = repository.getPrayerRouteById("RO-01")
+        assertEquals("RO-01", ro01?.id)
+        assertEquals("Oración breve para comenzar", ro01?.name)
+        assertEquals(listOf("GO-01", "GO-02", "GO-03"), ro01?.guideIds)
+        assertNull(repository.getPrayerRouteById("RO-9999"))
+    }
+
+    @Test
+    fun prayerGuides_loadedAndAccessible() {
+        val repository = MiMomentoContentRepository(
+            source = MiMomentoContentSource { TestContentFixture.loaded },
+        )
+        val guides = repository.getPrayerGuides()
+        assertEquals(9, guides.size)
+        val go01 = repository.getPrayerGuideById("GO-01")
+        assertEquals("GO-01", go01?.id)
+        assertEquals("Disposición", go01?.name)
+        assertNull(repository.getPrayerGuideById("GO-9999"))
+    }
+
+    @Test
+    fun specialContexts_loadedAndAccessible() {
+        val repository = MiMomentoContentRepository(
+            source = MiMomentoContentSource { TestContentFixture.loaded },
+        )
+        val contexts = repository.getSpecialContexts()
+        assertEquals(5, contexts.size)
+        val ctx02 = repository.getSpecialContextById("CTX-02")
+        assertEquals("CTX-02", ctx02?.id)
+        assertEquals("Tiempo de espera", ctx02?.label)
+        assertNull(repository.getSpecialContextById("CTX-9999"))
+    }
+
+    @Test
+    fun getSuggestedDevotional_delegatesCorrectly() {
+        val repository = MiMomentoContentRepository(
+            source = MiMomentoContentSource { TestContentFixture.loaded },
+        )
+        val dev = repository.getSuggestedDevotional(listOf("SIT-03"), listOf("CAT-07"))
+        assertEquals("DEV-0002", dev?.id)
+    }
 }

@@ -18,10 +18,48 @@
     <string name="nav_journal">Diario</string>
     <string name="nav_progress">Progreso</string>
 
+    <!-- Welcome Screen -->
+    <string name="welcome_title">Mi Momento</string>
+    <string name="welcome_subtitle">Pausa, reflexión y oración en tu día</string>
+    <string name="welcome_chip_devotionals">Devocionales</string>
+    <string name="welcome_chip_prayer">Oración</string>
+    <string name="welcome_chip_reflection">Reflexión</string>
+    <string name="welcome_chip_1">Devocionales</string>
+    <string name="welcome_chip_2">Oración</string>
+    <string name="welcome_chip_3">Reflexión</string>
+    <string name="welcome_start">Comenzar</string>
+    <string name="welcome_brand">NeuroNova Apps</string>
+
     <!-- Home Screen -->
     <string name="home_title">Mi Momento</string>
     <string name="home_subtitle">Pausa, reflexión y oración en tu día</string>
     <string name="home_cta_devotionals">Ver devocionales</string>
+    <string name="home_question">¿Qué quieres hacer ahora?</string>
+    <string name="home_question_description">Elige una opción para continuar tu momento.</string>
+    <string name="home_read_devotional">Leer un devocional</string>
+    <string name="home_go_prayers">Ir a Oraciones</string>
+    <string name="home_quick_access">Accesos</string>
+
+    <!-- Settings Screen -->
+    <string name="settings_title">Configuración</string>
+    <string name="settings_appearance">Apariencia</string>
+    <string name="settings_theme_light">Claro</string>
+    <string name="settings_theme_dark">Oscuro</string>
+    <string name="settings_theme_system">Sistema</string>
+    <string name="settings_text_size">Tamaño de texto</string>
+    <string name="settings_text_normal">Normal</string>
+    <string name="settings_text_large">Grande</string>
+    <string name="settings_text_extra_large">Muy grande</string>
+    <string name="settings_high_contrast">Alto contraste</string>
+    <string name="settings_language">Idioma</string>
+    <string name="settings_language_spanish">Español</string>
+    <string name="settings_about">Acerca de</string>
+    <string name="settings_app_name">Mi Momento</string>
+    <string name="settings_brand">NeuroNova Apps</string>
+    <string name="settings_version">Versión</string>
+    <string name="settings_privacy">Datos y privacidad</string>
+    <string name="settings_privacy_description">Mi Momento no requiere una cuenta para utilizar el contenido disponible.</string>
+    <string name="settings_content_description">Configuración</string>
 
     <!-- Devotionals Screen -->
     <string name="devotionals_title">Devocionales</string>
@@ -39,6 +77,82 @@
     <string name="detail_daily_action">Acción para hoy</string>
     <string name="detail_not_found_title">Contenido no disponible</string>
     <string name="detail_not_found_message">El devocional solicitado no se encuentra en el catálogo.</string>
+    <string name="devotional_finish">Finalizar devocional</string>
+    <string name="devotional_completed_title">Devocional finalizado</string>
+    <string name="devotional_completed_message">Has finalizado este momento de reflexión.</string>
+    <string name="devotional_back_to_prayers">Volver a Oraciones</string>
+    <string name="devotional_continue_here">Seguir aquí</string>
+
+    <!-- Prayers Screen -->
+    <string name="prayers_title">Oraciones</string>
+    <string name="prayers_subtitle">Orientación, pausas e intercesión</string>
+    <string name="prayers_tab_moments">Momentos</string>
+    <string name="prayers_tab_routes">Rutas</string>
+    <string name="prayers_tab_guides">Guías</string>
+    <string name="prayers_moments_explanation">Elige el momento o situación en la que te encuentras.</string>
+    <string name="prayers_routes_explanation">Sigue una secuencia guiada de principio a fin.</string>
+    <string name="prayers_guides_explanation">Encuentra una forma práctica de orientar tu oración.</string>
+    <string name="prayers_moments_count">%1$d momentos para orar</string>
+    <string name="prayers_routes_count">%1$d rutas de oración</string>
+    <string name="prayers_guides_count">%1$d guías de oración</string>
+    <string name="prayers_empty_moments">No hay momentos disponibles</string>
+    <string name="prayers_empty_routes">No hay rutas de oración disponibles</string>
+    <string name="prayers_empty_guides">No hay guías de oración disponibles</string>
+    <string name="prayer_steps_count">%1$d pasos</string>
+    <string name="prayer_step_number">Paso %1$d</string>
+    <string name="prayer_step_progress">Paso %1$d de %2$d</string>
+    <string name="prayer_guide_detail_title">Guía de oración</string>
+    <string name="prayer_route_detail_title">Ruta de oración</string>
+    <string name="spiritual_moment_detail_title">Momento para orar</string>
+    <string name="prayer_purpose_title">Propósito</string>
+    <string name="prayer_guidance_title">Orientación</string>
+    <string name="prayer_guide_purpose_title">Propósito</string>
+    <string name="prayer_guide_orientation_title">Cómo orientar tu oración</string>
+    <string name="prayer_moment_pause_title">Una pausa breve</string>
+    <string name="prayer_goal_title">Objetivo de la ruta</string>
+    <string name="prayer_steps_title">Pasos de la ruta</string>
+    <string name="prayer_interaction_title">Interacción sugerida</string>
+    <string name="prayer_description_title">Descripción</string>
+    <string name="prayer_topics_title">Categorías y temas</string>
+    <string name="prayer_situations_title">Situaciones relacionadas</string>
+    <string name="prayer_included_in_routes">Rutas que incluyen esta guía</string>
+    <string name="prayer_not_found_title">Contenido no disponible</string>
+    <string name="prayer_not_found_message">El contenido de oración solicitado no se encuentra en el catálogo.</string>
+    <string name="prayer_route_completed_title">Momento finalizado</string>
+    <string name="prayer_route_completed_message">Has recorrido los %1$d pasos de\n\"%2$s\".</string>
+    <string name="action_finish">Finalizar</string>
+    <string name="action_back_to_prayers">Volver a Oraciones</string>
+    <string name="home_cta_prayers">Ver oraciones</string>
+
+    <!-- CTAs -->
+    <string name="prayer_open_moment">Abrir momento</string>
+    <string name="prayer_view_guide">Ver guía</string>
+    <string name="prayer_start_route">Iniciar ruta</string>
+
+    <!-- Prayers Help Sheet -->
+    <string name="prayers_help">Cómo funciona</string>
+    <string name="prayers_help_title">Cómo funciona Oraciones</string>
+    <string name="prayers_help_moments_title">Momentos</string>
+    <string name="prayers_help_moments_body">Elige el momento o situación en la que te encuentras.</string>
+    <string name="prayers_help_moments_extra">Es una entrada breve para detenerte y comenzar.</string>
+    <string name="prayers_help_routes_title">Rutas</string>
+    <string name="prayers_help_routes_body">Sigue varios pasos en orden para vivir un recorrido completo de oración.</string>
+    <string name="prayers_help_routes_extra">Cada ruta te acompaña desde el inicio hasta el cierre.</string>
+    <string name="prayers_help_guides_title">Guías</string>
+    <string name="prayers_help_guides_body">Encuentra una forma práctica de orientar tu oración sobre un tema concreto.</string>
+    <string name="prayers_help_guides_extra">Úsalas cuando necesites una orientación específica.</string>
+    <string name="prayers_help_where_start_title">¿Por dónde empiezo?</string>
+    <string name="prayers_help_where_start_body">Si quieres hacer una pausa según el momento en que estás, elige Momentos.\n\nSi necesitas saber cómo orientar tu oración, entra en Guías.\n\nSi quieres seguir un proceso completo, utiliza Rutas.</string>
+    <string name="prayers_help_dismiss">Entendido</string>
+
+    <!-- Devotional Bridges -->
+    <string name="prayer_continue_moment_title">Continuar este momento</string>
+    <string name="prayer_continue_moment_description">Puedes profundizar con un devocional relacionado con este contexto.</string>
+    <string name="prayer_guide_deepen_title">Profundizar</string>
+    <string name="prayer_guide_deepen_description">Puedes continuar con un devocional relacionado con este tema.</string>
+    <string name="prayer_deepen_title">¿Quieres profundizar?</string>
+    <string name="prayer_deepen_description">Puedes continuar con un devocional relacionado con este tema.</string>
+    <string name="prayer_read_devotional">Leer devocional</string>
 
     <!-- Placeholders -->
     <string name="placeholder_prayers_title">Oraciones</string>
