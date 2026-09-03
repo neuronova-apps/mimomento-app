@@ -52,6 +52,9 @@ import com.neuronova.mimomento.R
 import com.neuronova.mimomento.data.model.MiMomentoThemeDefinition
 import com.neuronova.mimomento.data.model.MiMomentoThemeId
 import com.neuronova.mimomento.ui.theme.ThemeViewModel
+import com.neuronova.mimomento.ui.theme.ThemedCardAccentLine
+import com.neuronova.mimomento.ui.theme.themedCardBorder
+import com.neuronova.mimomento.ui.theme.themedCardColors
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -102,10 +105,10 @@ fun ThemesScreen(
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 shape = MaterialTheme.shapes.medium,
-                colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.6f),
-                ),
+                colors = themedCardColors(),
+                border = themedCardBorder(),
             ) {
+                ThemedCardAccentLine()
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -159,6 +162,7 @@ fun ThemesScreen(
                     colors = CardDefaults.cardColors(
                         containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.85f),
                     ),
+                    border = themedCardBorder(isSelected = true),
                 ) {
                     Row(
                         modifier = Modifier
@@ -264,9 +268,7 @@ private fun ThemeCard(
             )
             .clickable(enabled = isOwned, onClick = onSelect),
         shape = MaterialTheme.shapes.medium,
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.55f),
-        ),
+        colors = themedCardColors(),
     ) {
         Column(modifier = Modifier.fillMaxWidth()) {
             Box(

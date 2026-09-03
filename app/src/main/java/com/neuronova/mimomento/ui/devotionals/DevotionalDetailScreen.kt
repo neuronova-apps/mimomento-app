@@ -47,6 +47,11 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.neuronova.mimomento.R
 import com.neuronova.mimomento.data.model.Devotional
+import com.neuronova.mimomento.ui.theme.LocalActiveTheme
+import com.neuronova.mimomento.ui.theme.ThemedCardAccentLine
+import com.neuronova.mimomento.ui.theme.themedCardBorder
+import com.neuronova.mimomento.ui.theme.themedCardColors
+import com.neuronova.mimomento.ui.theme.themedTopAppBarColors
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -83,6 +88,7 @@ fun DevotionalDetailScreen(
                         )
                     }
                 },
+                colors = themedTopAppBarColors(),
             )
         },
         bottomBar = {
@@ -113,6 +119,9 @@ fun DevotionalDetailScreen(
     if (showFinishDialog) {
         AlertDialog(
             onDismissRequest = { showFinishDialog = false },
+            containerColor = LocalActiveTheme.current.visual.cardColor,
+            titleContentColor = MaterialTheme.colorScheme.onSurface,
+            textContentColor = MaterialTheme.colorScheme.onSurfaceVariant,
             title = {
                 Text(
                     text = stringResource(R.string.devotional_completed_title),
@@ -228,15 +237,15 @@ private fun DevotionalDetailContent(
         // 3. Palabra / Referencia Bíblica
         Card(
             modifier = Modifier.fillMaxWidth(),
-            colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.45f),
-            ),
+            colors = themedCardColors(),
+            border = themedCardBorder(),
             shape = MaterialTheme.shapes.medium,
         ) {
+            ThemedCardAccentLine()
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 12.dp),
+                    .padding(horizontal = 16.dp, vertical = 14.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Icon(
@@ -250,7 +259,7 @@ private fun DevotionalDetailContent(
                     text = devotional.bibleReference,
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onPrimaryContainer,
+                    color = MaterialTheme.colorScheme.primary,
                 )
             }
         }
@@ -261,7 +270,6 @@ private fun DevotionalDetailContent(
         DetailSectionCard(
             title = stringResource(R.string.detail_central_idea),
             content = devotional.centralIdea,
-            containerColor = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.4f),
             titleColor = MaterialTheme.colorScheme.primary,
         )
 
@@ -271,7 +279,6 @@ private fun DevotionalDetailContent(
         DetailSectionCard(
             title = stringResource(R.string.detail_reflection),
             content = devotional.reflection,
-            containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.35f),
             titleColor = MaterialTheme.colorScheme.primary,
         )
 
@@ -281,8 +288,7 @@ private fun DevotionalDetailContent(
         DetailSectionCard(
             title = stringResource(R.string.detail_personal_question),
             content = devotional.personalQuestion,
-            containerColor = MaterialTheme.colorScheme.tertiaryContainer.copy(alpha = 0.35f),
-            titleColor = MaterialTheme.colorScheme.tertiary,
+            titleColor = MaterialTheme.colorScheme.primary,
         )
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -291,7 +297,6 @@ private fun DevotionalDetailContent(
         DetailSectionCard(
             title = stringResource(R.string.detail_prayer_guide),
             content = devotional.prayerGuide,
-            containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.35f),
             titleColor = MaterialTheme.colorScheme.primary,
         )
 
@@ -301,7 +306,6 @@ private fun DevotionalDetailContent(
         DetailSectionCard(
             title = stringResource(R.string.detail_daily_action),
             content = devotional.dailyAction,
-            containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f),
             titleColor = MaterialTheme.colorScheme.primary,
         )
 
@@ -330,7 +334,7 @@ private fun DetailSectionCard(
     title: String,
     content: String,
     modifier: Modifier = Modifier,
-    containerColor: androidx.compose.ui.graphics.Color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.35f),
+    containerColor: androidx.compose.ui.graphics.Color = LocalActiveTheme.current.visual.cardColor,
     titleColor: androidx.compose.ui.graphics.Color = MaterialTheme.colorScheme.primary,
 ) {
     Card(
@@ -338,8 +342,10 @@ private fun DetailSectionCard(
         colors = CardDefaults.cardColors(
             containerColor = containerColor,
         ),
+        border = themedCardBorder(),
         shape = MaterialTheme.shapes.medium,
     ) {
+        ThemedCardAccentLine(alpha = 0.35f)
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -370,9 +376,9 @@ private fun DevotionalDetailBottomBar(
     modifier: Modifier = Modifier,
 ) {
     Surface(
-        tonalElevation = 3.dp,
-        shadowElevation = 4.dp,
-        color = MaterialTheme.colorScheme.surface,
+        tonalElevation = 0.dp,
+        shadowElevation = 0.dp,
+        color = LocalActiveTheme.current.visual.cardColor.copy(alpha = 0.94f),
         modifier = modifier.fillMaxWidth(),
     ) {
         Row(

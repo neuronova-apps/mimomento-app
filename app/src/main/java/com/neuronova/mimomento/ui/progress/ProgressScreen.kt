@@ -13,6 +13,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import com.neuronova.mimomento.R
 import com.neuronova.mimomento.ui.components.PlaceholderSection
+import com.neuronova.mimomento.ui.theme.themedTopAppBarColors
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -21,6 +22,7 @@ fun ProgressScreen(
 ) {
     Scaffold(
         modifier = modifier.fillMaxSize(),
+        containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             TopAppBar(
                 title = {
@@ -30,6 +32,7 @@ fun ProgressScreen(
                         fontWeight = FontWeight.Bold,
                     )
                 },
+                colors = themedTopAppBarColors(),
             )
         },
     ) { innerPadding ->

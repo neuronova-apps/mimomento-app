@@ -37,6 +37,7 @@ import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.PrimaryTabRow
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -58,6 +59,11 @@ import com.neuronova.mimomento.R
 import com.neuronova.mimomento.data.model.PrayerGuide
 import com.neuronova.mimomento.data.model.PrayerRoute
 import com.neuronova.mimomento.data.model.SpiritualMoment
+import com.neuronova.mimomento.ui.theme.LocalActiveTheme
+import com.neuronova.mimomento.ui.theme.ThemedCardAccentLine
+import com.neuronova.mimomento.ui.theme.themedCardBorder
+import com.neuronova.mimomento.ui.theme.themedCardColors
+import com.neuronova.mimomento.ui.theme.themedTopAppBarColors
 
 @Composable
 fun PrayerInfoBadge(
@@ -136,6 +142,7 @@ fun PrayersScreen(
                         )
                     }
                 },
+                colors = themedTopAppBarColors(),
             )
         },
     ) { innerPadding ->
@@ -147,6 +154,13 @@ fun PrayersScreen(
             PrimaryTabRow(
                 selectedTabIndex = uiState.selectedSection.ordinal,
                 modifier = Modifier.fillMaxWidth(),
+                containerColor = Color.Transparent,
+                contentColor = MaterialTheme.colorScheme.primary,
+                divider = {
+                    HorizontalDivider(
+                        color = LocalActiveTheme.current.visual.borderColor.copy(alpha = 0.5f),
+                    )
+                },
             ) {
                 Tab(
                     selected = uiState.selectedSection == PrayerSection.MOMENTS,
@@ -292,12 +306,12 @@ private fun SpiritualMomentCard(
                 role = Role.Button,
                 onClick = onClick,
             ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface,
-        ),
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
+        colors = themedCardColors(),
+        border = themedCardBorder(),
         shape = MaterialTheme.shapes.medium,
     ) {
+        ThemedCardAccentLine()
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -428,12 +442,12 @@ private fun PrayerRouteCard(
                 role = Role.Button,
                 onClick = onClick,
             ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 1.5.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface,
-        ),
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
+        colors = themedCardColors(),
+        border = themedCardBorder(),
         shape = MaterialTheme.shapes.medium,
     ) {
+        ThemedCardAccentLine()
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -582,12 +596,12 @@ private fun PrayerGuideCard(
                 role = Role.Button,
                 onClick = onClick,
             ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface,
-        ),
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
+        colors = themedCardColors(),
+        border = themedCardBorder(),
         shape = MaterialTheme.shapes.medium,
     ) {
+        ThemedCardAccentLine()
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -761,7 +775,7 @@ private fun PrayersHelpSectionCard(
     body: String,
     extra: String,
     modifier: Modifier = Modifier,
-    containerColor: Color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.35f),
+    containerColor: Color = LocalActiveTheme.current.visual.cardColor,
     titleColor: Color = MaterialTheme.colorScheme.primary,
 ) {
     Card(
@@ -769,8 +783,10 @@ private fun PrayersHelpSectionCard(
         colors = CardDefaults.cardColors(
             containerColor = containerColor,
         ),
+        border = themedCardBorder(),
         shape = MaterialTheme.shapes.medium,
     ) {
+        ThemedCardAccentLine(alpha = 0.35f)
         Column(
             modifier = Modifier
                 .fillMaxWidth()

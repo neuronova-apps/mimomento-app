@@ -1,4 +1,4 @@
-﻿package com.neuronova.mimomento.data.model
+package com.neuronova.mimomento.data.model
 
 import androidx.compose.ui.graphics.Color
 import com.neuronova.mimomento.R
@@ -50,19 +50,19 @@ data class MiMomentoThemeDefinition(
 
 object ThemeVisuals {
     val SKY = ThemeVisualDefinition(
-        primary = Color(0xFF2E6B8E),
-        secondary = Color(0xFF4A7D94),
-        surface = Color(0xFFF6F9FB),
-        surfaceVariant = Color(0xFFE4ECF2),
-        onSurface = Color(0xFF1B2830),
-        onBackground = Color(0xFF142028),
-        cardColor = Color(0xF2FFFFFF),
-        borderColor = Color(0x332E6B8E),
-        iconTint = Color(0xFF2E6B8E),
-        buttonColor = Color(0xFF2E6B8E),
+        primary = Color(0xFF24668D),
+        secondary = Color(0xFF4E7F99),
+        surface = Color(0xFFF2F7FA),
+        surfaceVariant = Color(0xFFE2ECF4),
+        onSurface = Color(0xFF15232D),
+        onBackground = Color(0xFF121F28),
+        cardColor = Color(0xEEF2F7FC),
+        borderColor = Color(0x3824668D),
+        iconTint = Color(0xFF24668D),
+        buttonColor = Color(0xFF24668D),
         onButtonColor = Color(0xFFFFFFFF),
-        overlayAlpha = 0.84f,
-        scrimColor = Color(0xFFF2F7FA),
+        overlayAlpha = 0.62f,
+        scrimColor = Color(0xFFEFF5FA),
         decorativeAlpha = 0.15f,
     )
 
@@ -143,6 +143,7 @@ object MiMomentoThemeCatalog {
         backgroundRes = R.drawable.theme_sky_bg,
         isPremium = false,
         visual = ThemeVisuals.SKY,
+        accentStyle = "SKY_CELESTIAL_ACCENT",
     )
 
     val DAWN = MiMomentoThemeDefinition(

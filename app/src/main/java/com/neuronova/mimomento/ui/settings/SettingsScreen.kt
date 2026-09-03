@@ -38,6 +38,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.neuronova.mimomento.BuildConfig
 import com.neuronova.mimomento.R
+import com.neuronova.mimomento.ui.theme.ThemedCardAccentLine
+import com.neuronova.mimomento.ui.theme.themedCardBorder
+import com.neuronova.mimomento.ui.theme.themedCardColors
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -94,10 +97,10 @@ fun SettingsScreen(
                     .fillMaxWidth()
                     .clickable(onClick = onNavigateToThemes),
                 shape = MaterialTheme.shapes.medium,
-                colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
-                ),
+                colors = themedCardColors(),
+                border = themedCardBorder(),
             ) {
+                ThemedCardAccentLine()
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -141,10 +144,10 @@ fun SettingsScreen(
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 shape = MaterialTheme.shapes.medium,
-                colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
-                ),
+                colors = themedCardColors(),
+                border = themedCardBorder(),
             ) {
+                ThemedCardAccentLine()
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -177,10 +180,10 @@ fun SettingsScreen(
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 shape = MaterialTheme.shapes.medium,
-                colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
-                ),
+                colors = themedCardColors(),
+                border = themedCardBorder(),
             ) {
+                ThemedCardAccentLine()
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -238,10 +241,10 @@ fun SettingsScreen(
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 shape = MaterialTheme.shapes.medium,
-                colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
-                ),
+                colors = themedCardColors(),
+                border = themedCardBorder(),
             ) {
+                ThemedCardAccentLine()
                 Text(
                     text = stringResource(R.string.settings_privacy_description),
                     style = MaterialTheme.typography.bodyMedium,

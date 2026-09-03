@@ -38,6 +38,10 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.neuronova.mimomento.R
 import com.neuronova.mimomento.data.model.Devotional
+import com.neuronova.mimomento.ui.theme.ThemedCardAccentLine
+import com.neuronova.mimomento.ui.theme.themedCardBorder
+import com.neuronova.mimomento.ui.theme.themedCardColors
+import com.neuronova.mimomento.ui.theme.themedTopAppBarColors
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -58,6 +62,7 @@ fun DevotionalsScreen(
                     fontWeight = FontWeight.Bold,
                 )
             },
+            colors = themedTopAppBarColors(),
         )
 
         CategoryFilterBar(
@@ -139,6 +144,20 @@ private fun CategoryFilterBar(
             FilterChip(
                 selected = isSelected,
                 onClick = { onSelectCategory(item.id) },
+                colors = FilterChipDefaults.filterChipColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
+                    labelColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                    selectedContainerColor = MaterialTheme.colorScheme.primaryContainer,
+                    selectedLabelColor = MaterialTheme.colorScheme.primary,
+                    selectedLeadingIconColor = MaterialTheme.colorScheme.primary,
+                ),
+                border = FilterChipDefaults.filterChipBorder(
+                    enabled = true,
+                    selected = isSelected,
+                    borderColor = MaterialTheme.colorScheme.outline,
+                    selectedBorderColor = MaterialTheme.colorScheme.primary,
+                    borderWidth = if (isSelected) 1.5.dp else 1.dp,
+                ),
                 label = {
                     Text(
                         text = if (item.count > 0) "$displayName (${item.count})" else displayName,
@@ -174,12 +193,12 @@ fun DevotionalCard(
                 role = Role.Button,
                 onClick = onClick,
             ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 1.5.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface,
-        ),
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
+        colors = themedCardColors(),
+        border = themedCardBorder(),
         shape = MaterialTheme.shapes.medium,
     ) {
+        ThemedCardAccentLine()
         Column(
             modifier = Modifier
                 .fillMaxWidth()
