@@ -3,3 +3,12 @@
 **/build/
 local.properties
 *.iml
+.kotlin/
+*.apk
+*.aab
+*.ap_
+.cxx/
+.externalNativeBuild/
+captures/
+output.json
+hs_err_pid*
