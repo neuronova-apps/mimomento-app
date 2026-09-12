@@ -1,5 +1,6 @@
 package com.neuronova.mimomento.ui.welcome
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -20,6 +21,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -132,17 +136,22 @@ private fun BrandMark() {
     Surface(
         modifier = Modifier.size(96.dp),
         shape = MaterialTheme.shapes.extraLarge,
-        color = MaterialTheme.colorScheme.primaryContainer,
-        contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+        color = Color.White,
         border = themedCardBorder(),
         tonalElevation = 2.dp,
+        shadowElevation = 2.dp,
     ) {
-        Box(contentAlignment = Alignment.Center) {
-            Text(
-                text = "MM",
-                style = MaterialTheme.typography.headlineLarge,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.primary,
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center,
+        ) {
+            Image(
+                painter = painterResource(R.drawable.mimomento_logo),
+                contentDescription = stringResource(R.string.welcome_title),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(10.dp),
+                contentScale = ContentScale.Fit,
             )
         }
     }
