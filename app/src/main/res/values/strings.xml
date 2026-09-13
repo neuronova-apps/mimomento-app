@@ -79,14 +79,24 @@
     <string name="settings_text_large">Grande</string>
     <string name="settings_text_extra_large">Muy grande</string>
     <string name="settings_high_contrast">Alto contraste</string>
+    <string name="settings_accessibility">Accesibilidad</string>
+    <string name="settings_accessibility_text_size_info">MiMomento respeta el tamaño de fuente configurado en tu dispositivo.</string>
     <string name="settings_language">Idioma</string>
     <string name="settings_language_spanish">Español</string>
     <string name="settings_about">Acerca de</string>
+    <string name="settings_about_header">Acerca de Mi Momento</string>
     <string name="settings_app_name">Mi Momento</string>
     <string name="settings_brand">NeuroNova Apps</string>
     <string name="settings_version">Versión</string>
     <string name="settings_privacy">Datos y privacidad</string>
     <string name="settings_privacy_description">Mi Momento no requiere una cuenta para utilizar el contenido disponible.</string>
+    <string name="settings_privacy_journal_title">Diario en tu dispositivo</string>
+    <string name="settings_privacy_journal_desc">Tus entradas del Diario se almacenan localmente en este dispositivo.</string>
+    <string name="settings_privacy_progress_title">Progreso personal</string>
+    <string name="settings_privacy_progress_desc">Los datos utilizados para mostrar tu progreso se almacenan localmente en este dispositivo.</string>
+    <string name="settings_privacy_account_title">Sin cuenta obligatoria</string>
+    <string name="settings_privacy_account_desc">MiMomento puede utilizarse sin crear una cuenta.</string>
+    <string name="settings_privacy_policy">Política de privacidad</string>
     <string name="settings_content_description">Configuración</string>
 
     <!-- Devotionals Screen -->
