@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="status_bar_light">#F2F7FA</color>
-    <color name="navigation_bar_light">#F2F7FC</color>
-
     <style name="Theme.MiMomento" parent="android:style/Theme.Material.Light.NoActionBar">
         <item name="android:fontFamily">sans</item>
         <item name="android:statusBarColor">@color/status_bar_light</item>
         <item name="android:windowLightStatusBar">true</item>
+        <item name="android:navigationBarColor">@color/navigation_bar_light</item>
+        <item name="android:windowLightNavigationBar">true</item>
     </style>
 </resources>

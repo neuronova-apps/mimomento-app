@@ -1,5 +1,9 @@
 package com.neuronova.mimomento.ui.theme
 
+import android.app.Activity
+import android.content.Context
+import android.content.ContextWrapper
+import android.os.Build
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
@@ -17,6 +21,7 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
@@ -24,7 +29,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.unit.dp
+import androidx.core.view.WindowCompat
 import com.neuronova.mimomento.data.model.MiMomentoThemeCatalog
 import com.neuronova.mimomento.data.model.MiMomentoThemeDefinition
 
@@ -64,12 +72,35 @@ fun MiMomentoTheme(
         outlineVariant = theme.visual.borderColor.copy(alpha = 0.4f),
     )
 
+    val view = LocalView.current
+    if (!view.isInEditMode) {
+        SideEffect {
+            val activity = view.context.findActivity() ?: return@SideEffect
+            val window = activity.window
+            val insetsController = WindowCompat.getInsetsController(window, view)
+
+            window.statusBarColor = theme.visual.surface.toArgb()
+            insetsController.isAppearanceLightStatusBars = true
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
+                window.navigationBarColor = theme.visual.cardColor.toArgb()
+                insetsController.isAppearanceLightNavigationBars = true
+            }
+        }
+    }
+
     CompositionLocalProvider(LocalActiveTheme provides theme) {
         MaterialTheme(
             colorScheme = colorScheme,
             content = content,
         )
     }
+}
+
+private tailrec fun Context.findActivity(): Activity? = when (this) {
+    is Activity -> this
+    is ContextWrapper -> baseContext.findActivity()
+    else -> null
 }
 
 /**
