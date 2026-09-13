@@ -16,6 +16,8 @@ class MiMomentoNavigationTest {
         assertEquals("journal", MiMomentoDestinations.JOURNAL)
         assertEquals("progress", MiMomentoDestinations.PROGRESS)
         assertEquals("settings", MiMomentoDestinations.SETTINGS)
+        assertEquals("settings/themes", MiMomentoDestinations.THEMES)
+        assertEquals("settings/about", MiMomentoDestinations.ABOUT)
         assertEquals("devotionals/{devotionalId}", MiMomentoDestinations.DEVOTIONAL_DETAIL_ROUTE)
     }
 
@@ -228,6 +230,44 @@ class MiMomentoNavigationTest {
         assertTrue("Themes suppresses bottom bar", !shouldShowBottomBar(backStack.last()))
 
         // User presses back from Themes:
+        backStack.removeAt(backStack.size - 1)
+        assertEquals(listOf(MiMomentoDestinations.HOME, MiMomentoDestinations.SETTINGS), backStack)
+
+        // User presses back from Settings:
+        backStack.removeAt(backStack.size - 1)
+        assertEquals(listOf(MiMomentoDestinations.HOME), backStack)
+        assertTrue("Home shows bottom bar", shouldShowBottomBar(backStack.last()))
+    }
+
+    @Test
+    fun aboutRoute_isCanonicalAndNotTopLevelTab() {
+        assertEquals("settings/about", MiMomentoDestinations.ABOUT)
+        assertTrue(
+            "About must NOT be in top-level bottom navigation destinations",
+            TOP_LEVEL_DESTINATIONS.none { it.route == MiMomentoDestinations.ABOUT },
+        )
+    }
+
+    @Test
+    fun aboutScreen_suppressesBottomNavigationBar() {
+        assertTrue(
+            "About route must hide bottom navigation bar",
+            !shouldShowBottomBar(MiMomentoDestinations.ABOUT),
+        )
+    }
+
+    @Test
+    fun settingsToAbout_operatesOnStandardBackStack() {
+        val backStack = mutableListOf(MiMomentoDestinations.HOME, MiMomentoDestinations.SETTINGS)
+        // User taps About row in Settings:
+        backStack.add(MiMomentoDestinations.ABOUT)
+        assertEquals(
+            listOf(MiMomentoDestinations.HOME, MiMomentoDestinations.SETTINGS, MiMomentoDestinations.ABOUT),
+            backStack,
+        )
+        assertTrue("About suppresses bottom bar", !shouldShowBottomBar(backStack.last()))
+
+        // User presses back from About:
         backStack.removeAt(backStack.size - 1)
         assertEquals(listOf(MiMomentoDestinations.HOME, MiMomentoDestinations.SETTINGS), backStack)
 

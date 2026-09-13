@@ -27,6 +27,7 @@ import com.neuronova.mimomento.ui.prayers.PrayersViewModel
 import com.neuronova.mimomento.ui.prayers.SpiritualMomentDetailScreen
 import com.neuronova.mimomento.ui.progress.ProgressScreen
 import com.neuronova.mimomento.ui.progress.ProgressViewModel
+import com.neuronova.mimomento.ui.settings.AboutScreen
 import com.neuronova.mimomento.ui.settings.SettingsScreen
 import com.neuronova.mimomento.ui.journal.JournalViewModel
 import com.neuronova.mimomento.ui.settings.ThemesScreen
@@ -114,6 +115,7 @@ fun MiMomentoNavHost(
             SettingsScreen(
                 onNavigateUp = { navController.navigateUp() },
                 onNavigateToThemes = { navController.navigate(MiMomentoDestinations.THEMES) },
+                onNavigateToAbout = { navController.navigate(MiMomentoDestinations.ABOUT) },
                 currentThemeName = currentThemeName,
             )
         }
@@ -125,6 +127,12 @@ fun MiMomentoNavHost(
                     onNavigateUp = { navController.navigateUp() },
                 )
             }
+        }
+
+        composable(route = MiMomentoDestinations.ABOUT) {
+            AboutScreen(
+                onNavigateUp = { navController.navigateUp() },
+            )
         }
 
         composable(route = MiMomentoDestinations.DEVOTIONALS) {

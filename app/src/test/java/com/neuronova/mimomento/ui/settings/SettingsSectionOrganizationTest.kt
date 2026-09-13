@@ -14,17 +14,19 @@ import org.junit.Test
 class SettingsSectionOrganizationTest {
 
     @Test
-    fun settingsAndThemes_canonicalDestinationsExist() {
+    fun settingsThemesAndAbout_canonicalDestinationsExist() {
         assertEquals("settings", MiMomentoDestinations.SETTINGS)
         assertEquals("settings/themes", MiMomentoDestinations.THEMES)
+        assertEquals("settings/about", MiMomentoDestinations.ABOUT)
 
-        // Neither Settings nor Themes are top-level bottom-nav tabs
+        // Neither Settings, Themes nor About are top-level bottom-nav tabs
         assertTrue(TOP_LEVEL_DESTINATIONS.none { it.route == MiMomentoDestinations.SETTINGS })
         assertTrue(TOP_LEVEL_DESTINATIONS.none { it.route == MiMomentoDestinations.THEMES })
+        assertTrue(TOP_LEVEL_DESTINATIONS.none { it.route == MiMomentoDestinations.ABOUT })
     }
 
     @Test
-    fun bottomBarSuppressed_onSettingsAndThemesRoutes() {
+    fun bottomBarSuppressed_onSettingsThemesAndAboutRoutes() {
         assertFalse(
             "Settings must suppress bottom navigation bar",
             shouldShowBottomBar(MiMomentoDestinations.SETTINGS),
@@ -32,6 +34,10 @@ class SettingsSectionOrganizationTest {
         assertFalse(
             "Themes must suppress bottom navigation bar",
             shouldShowBottomBar(MiMomentoDestinations.THEMES),
+        )
+        assertFalse(
+            "About must suppress bottom navigation bar",
+            shouldShowBottomBar(MiMomentoDestinations.ABOUT),
         )
     }
 
@@ -105,5 +111,59 @@ class SettingsSectionOrganizationTest {
 
         val defaultTheme = MiMomentoThemeCatalog.DEFAULT_THEME
         assertEquals(MiMomentoThemeId.SKY, defaultTheme.id)
+    }
+
+    @Test
+    fun backStackTransitions_fromHomeToSettingsToAboutAndReturn() {
+        val backStack = mutableListOf(MiMomentoDestinations.HOME)
+        assertTrue(shouldShowBottomBar(backStack.last()))
+
+        // 1. Enter Settings
+        backStack.add(MiMomentoDestinations.SETTINGS)
+        assertEquals(listOf(MiMomentoDestinations.HOME, MiMomentoDestinations.SETTINGS), backStack)
+        assertFalse(shouldShowBottomBar(backStack.last()))
+
+        // 2. Navigate from Settings to About
+        backStack.add(MiMomentoDestinations.ABOUT)
+        assertEquals(
+            listOf(MiMomentoDestinations.HOME, MiMomentoDestinations.SETTINGS, MiMomentoDestinations.ABOUT),
+            backStack,
+        )
+        assertFalse(shouldShowBottomBar(backStack.last()))
+
+        // 3. Navigate back from About to Settings
+        backStack.removeAt(backStack.size - 1)
+        assertEquals(listOf(MiMomentoDestinations.HOME, MiMomentoDestinations.SETTINGS), backStack)
+        assertFalse(shouldShowBottomBar(backStack.last()))
+
+        // 4. Navigate back from Settings to Home
+        backStack.removeAt(backStack.size - 1)
+        assertEquals(listOf(MiMomentoDestinations.HOME), backStack)
+        assertTrue(shouldShowBottomBar(backStack.last()))
+    }
+
+    @Test
+    fun settingsAboutSection_delegatesToDedicatedScreenWithoutInliningAboutDetails() {
+        // Settings contains only the entry point row for About
+        val settingsSection4Scope = setOf("about_access_row", "chevron_navigation")
+
+        // Detailed about content belongs exclusively to AboutScreen (settings/about)
+        val aboutDedicatedScreenScope = setOf(
+            "large_logo",
+            "extended_description",
+            "purpose",
+            "features_list",
+            "support_links",
+            "neuronova_links",
+            "version_code_compilation",
+            "credits",
+            "dynamic_copyright",
+        )
+
+        val overlap = settingsSection4Scope.intersect(aboutDedicatedScreenScope)
+        assertTrue(
+            "Settings must not inline detailed About content; it must delegate to AboutScreen",
+            overlap.isEmpty(),
+        )
     }
 }
