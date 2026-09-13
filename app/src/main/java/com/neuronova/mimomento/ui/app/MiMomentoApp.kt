@@ -30,11 +30,14 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.neuronova.mimomento.data.local.FileJournalStorage
+import com.neuronova.mimomento.data.local.FileProgressStorage
 import com.neuronova.mimomento.data.model.MiMomentoThemeCatalog
 import com.neuronova.mimomento.data.repository.DefaultThemeAvailabilityPolicy
 import com.neuronova.mimomento.data.repository.JournalRepository
 import com.neuronova.mimomento.data.repository.LocalJournalRepository
+import com.neuronova.mimomento.data.repository.LocalProgressRepository
 import com.neuronova.mimomento.data.repository.MiMomentoContentRepository
+import com.neuronova.mimomento.data.repository.ProgressRepository
 import com.neuronova.mimomento.data.repository.ThemeAvailabilityPolicy
 import com.neuronova.mimomento.data.repository.ThemePreferencesRepository
 import com.neuronova.mimomento.data.validation.MiMomentoContentValidator
@@ -47,6 +50,7 @@ import com.neuronova.mimomento.ui.navigation.MiMomentoNavHost
 import com.neuronova.mimomento.ui.navigation.TOP_LEVEL_DESTINATIONS
 import com.neuronova.mimomento.ui.navigation.shouldShowBottomBar
 import com.neuronova.mimomento.ui.prayers.PrayersViewModel
+import com.neuronova.mimomento.ui.progress.ProgressViewModel
 import com.neuronova.mimomento.ui.theme.MiMomentoTheme
 import com.neuronova.mimomento.ui.theme.ThemedBackground
 import com.neuronova.mimomento.ui.theme.ThemeUiState
@@ -58,6 +62,7 @@ fun MiMomentoApp(
     repository: MiMomentoContentRepository,
     themeRepository: ThemePreferencesRepository? = null,
     journalRepository: JournalRepository? = null,
+    progressRepository: ProgressRepository? = null,
     availabilityPolicy: ThemeAvailabilityPolicy = DefaultThemeAvailabilityPolicy(),
     previewPolicy: com.neuronova.mimomento.data.repository.DebugThemePreviewPolicy = com.neuronova.mimomento.data.repository.DefaultDebugThemePreviewPolicy(),
     validator: MiMomentoContentValidator = MiMomentoContentValidator(),
@@ -71,17 +76,31 @@ fun MiMomentoApp(
         factory = PrayersViewModel.provideFactory(repository),
     ),
     journalViewModel: JournalViewModel? = null,
+    progressViewModel: ProgressViewModel? = null,
     themeViewModel: ThemeViewModel? = themeRepository?.let {
         viewModel(factory = ThemeViewModel.provideFactory(it, availabilityPolicy, previewPolicy))
     },
     navController: NavHostController = rememberNavController(),
 ) {
     val context = LocalContext.current
+    val effectiveJournalRepository: JournalRepository = journalRepository ?: remember {
+        LocalJournalRepository(FileJournalStorage(File(context.filesDir, "journal_entries.json")))
+    }
+    val effectiveProgressRepository: ProgressRepository = progressRepository ?: remember {
+        LocalProgressRepository(
+            storage = FileProgressStorage(File(context.filesDir, "progress_events.json")),
+            journalRepository = effectiveJournalRepository,
+        )
+    }
     val effectiveJournalViewModel: JournalViewModel = journalViewModel ?: viewModel(
         factory = JournalViewModel.provideFactory(
-            journalRepository ?: remember {
-                LocalJournalRepository(FileJournalStorage(File(context.filesDir, "journal_entries.json")))
-            }
+            repository = effectiveJournalRepository,
+            progressRepository = effectiveProgressRepository,
+        )
+    )
+    val effectiveProgressViewModel: ProgressViewModel = progressViewModel ?: viewModel(
+        factory = ProgressViewModel.provideFactory(
+            repository = effectiveProgressRepository,
         )
     )
     val contentState by appContentViewModel.uiState.collectAsState()
@@ -172,6 +191,8 @@ fun MiMomentoApp(
                             devotionalsViewModel = devotionalsViewModel,
                             prayersViewModel = prayersViewModel,
                             journalViewModel = effectiveJournalViewModel,
+                            progressViewModel = effectiveProgressViewModel,
+                            progressRepository = effectiveProgressRepository,
                             themeViewModel = themeViewModel,
                             devotionalCount = state.devotionalCount,
                             onNavigateToDevotionals = {

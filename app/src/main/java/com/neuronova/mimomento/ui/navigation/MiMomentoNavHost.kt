@@ -1,14 +1,18 @@
 package com.neuronova.mimomento.ui.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import com.neuronova.mimomento.data.model.ProgressEventType
+import com.neuronova.mimomento.data.repository.ProgressRepository
 import com.neuronova.mimomento.ui.devotionals.DevotionalDetailScreen
 import com.neuronova.mimomento.ui.devotionals.DevotionalsScreen
 import com.neuronova.mimomento.ui.devotionals.DevotionalsViewModel
@@ -21,11 +25,13 @@ import com.neuronova.mimomento.ui.prayers.PrayersScreen
 import com.neuronova.mimomento.ui.prayers.PrayersViewModel
 import com.neuronova.mimomento.ui.prayers.SpiritualMomentDetailScreen
 import com.neuronova.mimomento.ui.progress.ProgressScreen
+import com.neuronova.mimomento.ui.progress.ProgressViewModel
 import com.neuronova.mimomento.ui.settings.SettingsScreen
 import com.neuronova.mimomento.ui.journal.JournalViewModel
 import com.neuronova.mimomento.ui.settings.ThemesScreen
 import com.neuronova.mimomento.ui.theme.ThemeViewModel
 import com.neuronova.mimomento.ui.welcome.WelcomeScreen
+import kotlinx.coroutines.launch
 
 @Composable
 fun MiMomentoNavHost(
@@ -38,7 +44,10 @@ fun MiMomentoNavHost(
     startDestination: String = MiMomentoDestinations.START_DESTINATION,
     themeViewModel: ThemeViewModel? = null,
     journalViewModel: JournalViewModel? = null,
+    progressViewModel: ProgressViewModel? = null,
+    progressRepository: ProgressRepository? = null,
 ) {
+    val coroutineScope = rememberCoroutineScope()
     NavHost(
         navController = navController,
         startDestination = startDestination,
@@ -150,7 +159,9 @@ fun MiMomentoNavHost(
         }
 
         composable(route = MiMomentoDestinations.PROGRESS) {
-            ProgressScreen()
+            if (progressViewModel != null) {
+                ProgressScreen(viewModel = progressViewModel)
+            }
         }
 
         composable(
@@ -166,6 +177,15 @@ fun MiMomentoNavHost(
             ).orEmpty()
             val detailUiState = devotionalsViewModel.getDevotionalDetailUiState(devotionalId)
 
+            LaunchedEffect(devotionalId) {
+                if (devotionalId.isNotBlank()) {
+                    progressRepository?.recordEvent(
+                        type = ProgressEventType.DEVOTIONAL_OPENED,
+                        referenceId = devotionalId,
+                    )
+                }
+            }
+
             DevotionalDetailScreen(
                 uiState = detailUiState,
                 onNavigateUp = { navController.navigateUp() },
@@ -177,6 +197,14 @@ fun MiMomentoNavHost(
                     }
                 },
                 onFinishDevotional = {
+                    coroutineScope.launch {
+                        if (devotionalId.isNotBlank()) {
+                            progressRepository?.recordEvent(
+                                type = ProgressEventType.DEVOTIONAL_COMPLETED,
+                                referenceId = devotionalId,
+                            )
+                        }
+                    }
                     navController.navigate(MiMomentoDestinations.PRAYERS) {
                         popUpTo(MiMomentoDestinations.HOME) {
                             inclusive = false
@@ -200,6 +228,15 @@ fun MiMomentoNavHost(
             ).orEmpty()
             val detailUiState = prayersViewModel.getGuideDetailUiState(guideId)
 
+            LaunchedEffect(guideId) {
+                if (guideId.isNotBlank()) {
+                    progressRepository?.recordEvent(
+                        type = ProgressEventType.PRAYER_OPENED,
+                        referenceId = guideId,
+                    )
+                }
+            }
+
             PrayerGuideDetailScreen(
                 uiState = detailUiState,
                 onNavigateUp = { navController.navigateUp() },
@@ -220,6 +257,15 @@ fun MiMomentoNavHost(
             val routeId = backStackEntry.arguments?.getString(
                 MiMomentoDestinations.PRAYER_ROUTE_ID_ARG,
             ).orEmpty()
+
+            LaunchedEffect(routeId) {
+                if (routeId.isNotBlank()) {
+                    progressRepository?.recordEvent(
+                        type = ProgressEventType.PRAYER_OPENED,
+                        referenceId = routeId,
+                    )
+                }
+            }
 
             PrayerRouteDetailScreen(
                 routeId = routeId,
@@ -243,6 +289,15 @@ fun MiMomentoNavHost(
                 MiMomentoDestinations.SPIRITUAL_MOMENT_ID_ARG,
             ).orEmpty()
             val detailUiState = prayersViewModel.getSpiritualMomentDetailUiState(momentId)
+
+            LaunchedEffect(momentId) {
+                if (momentId.isNotBlank()) {
+                    progressRepository?.recordEvent(
+                        type = ProgressEventType.PRAYER_OPENED,
+                        referenceId = momentId,
+                    )
+                }
+            }
 
             SpiritualMomentDetailScreen(
                 uiState = detailUiState,

@@ -217,4 +217,26 @@
     <string name="placeholder_journal_message">Esta sección se habilitará en una siguiente fase.</string>
     <string name="placeholder_progress_title">Progreso</string>
     <string name="placeholder_progress_message">Esta sección se habilitará en una siguiente fase.</string>
+
+    <!-- Progress Screen -->
+    <string name="progress_title">Progreso</string>
+    <string name="progress_empty_title">Tu recorrido personal</string>
+    <string name="progress_empty_message">Aquí podrás ver tu recorrido a medida que uses Mi Momento. Lee un devocional, realiza una oración o escribe en tu diario para comenzar.</string>
+    <string name="progress_section_overview">Resumen general</string>
+    <string name="progress_active_days">Días con actividad</string>
+    <string name="progress_active_days_format">%1$d días</string>
+    <string name="progress_streak_title">Constancia actual</string>
+    <string name="progress_streak_days">Días de constancia</string>
+    <string name="progress_streak_format">%1$d días consecutivos</string>
+    <string name="progress_journal_entries">Entradas de Diario</string>
+    <string name="progress_journal_entries_format">%1$d reflexiones registradas</string>
+    <string name="progress_section_reading_prayer">Lectura y Oración</string>
+    <string name="progress_devotionals_completed">Devocionales completados</string>
+    <string name="progress_devotionals_opened">Devocionales explorados</string>
+    <string name="progress_prayers_opened">Oraciones consultadas</string>
+    <string name="progress_section_weekly">Actividad de los últimos 7 días</string>
+    <string name="progress_weekly_active_format">%1$d de 7 días con actividad</string>
+    <string name="progress_section_monthly">Actividad este mes</string>
+    <string name="progress_monthly_active_format">%1$d días activos en el mes</string>
+    <string name="progress_monthly_events_format">%1$d momentos registrados</string>
 </resources>

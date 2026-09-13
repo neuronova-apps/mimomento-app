@@ -5,7 +5,9 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.neuronova.mimomento.data.model.JournalEntry
 import com.neuronova.mimomento.data.model.JournalMood
+import com.neuronova.mimomento.data.model.ProgressEventType
 import com.neuronova.mimomento.data.repository.JournalRepository
+import com.neuronova.mimomento.data.repository.ProgressRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -26,6 +28,7 @@ data class JournalUiState(
 
 class JournalViewModel(
     private val repository: JournalRepository,
+    private val progressRepository: ProgressRepository? = null,
     externalScope: kotlinx.coroutines.CoroutineScope? = null,
 ) : ViewModel() {
 
@@ -125,7 +128,15 @@ class JournalViewModel(
                 )
             }
 
-            result.onSuccess {
+            result.onSuccess { savedEntry ->
+                scope.launch {
+                    val eventType = if (currentState.editingEntryId != null) {
+                        ProgressEventType.JOURNAL_EDITED
+                    } else {
+                        ProgressEventType.JOURNAL_CREATED
+                    }
+                    progressRepository?.recordEvent(eventType, referenceId = savedEntry.id)
+                }
                 _uiState.update {
                     it.copy(
                         isEditorOpen = false,
@@ -184,10 +195,11 @@ class JournalViewModel(
     companion object {
         fun provideFactory(
             repository: JournalRepository,
+            progressRepository: ProgressRepository? = null,
         ): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
             @Suppress("UNCHECKED_CAST")
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                return JournalViewModel(repository) as T
+                return JournalViewModel(repository, progressRepository) as T
             }
         }
     }
