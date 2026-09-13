@@ -50,6 +50,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.neuronova.mimomento.BuildConfig
 import com.neuronova.mimomento.R
+import com.neuronova.mimomento.ui.theme.LocalHighContrast
 import com.neuronova.mimomento.ui.theme.ThemedCardAccentLine
 import com.neuronova.mimomento.ui.theme.themedCardBorder
 import com.neuronova.mimomento.ui.theme.themedCardColors
@@ -303,13 +304,14 @@ private fun AboutHero(modifier: Modifier = Modifier) {
         modifier = modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
+        val isHC = LocalHighContrast.current
         Surface(
             modifier = Modifier.size(96.dp),
             shape = MaterialTheme.shapes.large,
-            color = Color.White,
+            color = if (isHC) Color(0xFF101010) else Color.White,
             border = themedCardBorder(),
-            tonalElevation = 2.dp,
-            shadowElevation = 2.dp,
+            tonalElevation = if (isHC) 0.dp else 2.dp,
+            shadowElevation = if (isHC) 0.dp else 2.dp,
         ) {
             Box(
                 modifier = Modifier.fillMaxSize(),
@@ -391,11 +393,12 @@ private fun AboutCard(
                 .fillMaxWidth()
                 .padding(18.dp),
         ) {
+            val isHC = LocalHighContrast.current
             Text(
                 text = title,
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onSurface,
+                color = if (isHC) Color(0xFFFFD600) else MaterialTheme.colorScheme.onSurface,
             )
             Spacer(modifier = Modifier.height(12.dp))
             content()
@@ -447,17 +450,18 @@ private fun AboutExternalLink(
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,
     ) {
+        val isHC = LocalHighContrast.current
         Text(
             text = label,
             style = MaterialTheme.typography.bodyLarge,
             fontWeight = FontWeight.Medium,
-            color = MaterialTheme.colorScheme.primary,
+            color = if (isHC) Color(0xFFFFD600) else MaterialTheme.colorScheme.primary,
             modifier = Modifier.weight(1f),
         )
         Icon(
             imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
             contentDescription = null,
-            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+            tint = if (isHC) Color(0xFFFFD600) else MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.size(20.dp),
         )
     }

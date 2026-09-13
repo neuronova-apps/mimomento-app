@@ -51,10 +51,12 @@ import androidx.compose.ui.unit.dp
 import com.neuronova.mimomento.R
 import com.neuronova.mimomento.data.model.MiMomentoThemeDefinition
 import com.neuronova.mimomento.data.model.MiMomentoThemeId
+import com.neuronova.mimomento.ui.theme.LocalHighContrast
 import com.neuronova.mimomento.ui.theme.ThemeViewModel
 import com.neuronova.mimomento.ui.theme.ThemedCardAccentLine
 import com.neuronova.mimomento.ui.theme.themedCardBorder
 import com.neuronova.mimomento.ui.theme.themedCardColors
+import com.neuronova.mimomento.ui.theme.themedSwitchColors
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -138,6 +140,7 @@ fun ThemesScreen(
                             checked = uiState.autoThemeEnabled,
                             onCheckedChange = { themeViewModel.toggleAutoTheme(it) },
                             enabled = uiState.canEnableAutoTheme,
+                            colors = themedSwitchColors(),
                         )
                     }
 
@@ -205,11 +208,12 @@ fun ThemesScreen(
             }
 
             // Cabecera Catálogo de temas
+            val isHC = LocalHighContrast.current
             Text(
                 text = stringResource(R.string.themes_catalog_header),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.SemiBold,
-                color = MaterialTheme.colorScheme.onBackground,
+                color = if (isHC) Color(0xFFFFD600) else MaterialTheme.colorScheme.onBackground,
             )
 
             Spacer(modifier = Modifier.height(12.dp))
@@ -249,12 +253,13 @@ private fun ThemeCard(
     onExitPreview: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val isHC = LocalHighContrast.current
     val borderColor = if (isSelected) {
-        MaterialTheme.colorScheme.primary
+        if (isHC) Color(0xFFFFD600) else MaterialTheme.colorScheme.primary
     } else if (isPreviewing) {
-        MaterialTheme.colorScheme.tertiary
+        if (isHC) Color(0xFFFFD600) else MaterialTheme.colorScheme.tertiary
     } else {
-        MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
+        if (isHC) Color.White else MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
     }
 
     Card(
@@ -262,7 +267,7 @@ private fun ThemeCard(
             .fillMaxWidth()
             .clip(MaterialTheme.shapes.medium)
             .border(
-                width = if (isSelected || isPreviewing) 2.dp else 1.dp,
+                width = if (isSelected || isPreviewing) 2.dp else if (isHC) 2.dp else 1.dp,
                 color = borderColor,
                 shape = MaterialTheme.shapes.medium,
             )

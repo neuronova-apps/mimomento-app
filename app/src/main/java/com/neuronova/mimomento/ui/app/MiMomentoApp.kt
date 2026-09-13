@@ -165,14 +165,15 @@ fun MiMomentoApp(
                         containerColor = Color.Transparent,
                         bottomBar = {
                             if (showBottomBar) {
+                                val isHC = accessibilityUiState.highContrast
                                 NavigationBar(
-                                    containerColor = activeTheme.visual.cardColor.copy(alpha = 0.94f),
+                                    containerColor = if (isHC) Color.Black else activeTheme.visual.cardColor.copy(alpha = 0.94f),
                                     modifier = Modifier.drawBehind {
                                         drawLine(
-                                            color = activeTheme.visual.borderColor.copy(alpha = 0.5f),
+                                            color = if (isHC) Color.White else activeTheme.visual.borderColor.copy(alpha = 0.5f),
                                             start = Offset(0f, 0f),
                                             end = Offset(size.width, 0f),
-                                            strokeWidth = 1.dp.toPx(),
+                                            strokeWidth = if (isHC) 2.dp.toPx() else 1.dp.toPx(),
                                         )
                                     },
                                 ) {
@@ -207,11 +208,11 @@ fun MiMomentoApp(
                                                 )
                                             },
                                             colors = NavigationBarItemDefaults.colors(
-                                                selectedIconColor = activeTheme.visual.primary,
-                                                selectedTextColor = activeTheme.visual.primary,
-                                                indicatorColor = activeTheme.visual.surfaceVariant.copy(alpha = 0.85f),
-                                                unselectedIconColor = activeTheme.visual.onSurface.copy(alpha = 0.65f),
-                                                unselectedTextColor = activeTheme.visual.onSurface.copy(alpha = 0.65f),
+                                                selectedIconColor = if (isHC) Color(0xFFFFD600) else activeTheme.visual.primary,
+                                                selectedTextColor = if (isHC) Color(0xFFFFD600) else activeTheme.visual.primary,
+                                                indicatorColor = if (isHC) Color(0xFF101010) else activeTheme.visual.surfaceVariant.copy(alpha = 0.85f),
+                                                unselectedIconColor = if (isHC) Color.White else activeTheme.visual.onSurface.copy(alpha = 0.65f),
+                                                unselectedTextColor = if (isHC) Color.White else activeTheme.visual.onSurface.copy(alpha = 0.65f),
                                             ),
                                         )
                                     }

@@ -33,10 +33,20 @@ data class ThemeVisualDefinition(
     val decorativeAlpha: Float = 0.15f,
 ) {
     fun toHighContrast(): ThemeVisualDefinition = copy(
-        cardColor = cardColor.copy(alpha = 1.0f),
-        borderColor = primary.copy(alpha = 0.65f),
-        overlayAlpha = (overlayAlpha + 0.15f).coerceAtMost(0.92f),
-        decorativeAlpha = 0.30f,
+        primary = Color(0xFFFFD600),
+        secondary = Color(0xFFFFFFFF),
+        surface = Color(0xFF000000),
+        surfaceVariant = Color(0xFF101010),
+        onSurface = Color(0xFFFFFFFF),
+        onBackground = Color(0xFFFFFFFF),
+        cardColor = Color(0xFF101010),
+        borderColor = Color(0xFFFFFFFF),
+        iconTint = Color(0xFFFFD600),
+        buttonColor = Color(0xFFFFD600),
+        onButtonColor = Color(0xFF000000),
+        overlayAlpha = 1.0f,
+        scrimColor = Color(0xFF000000),
+        decorativeAlpha = 0.0f,
     )
 }
 

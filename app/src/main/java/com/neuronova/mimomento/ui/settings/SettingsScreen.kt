@@ -35,7 +35,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.graphics.Color
 import com.neuronova.mimomento.R
+import com.neuronova.mimomento.ui.theme.LocalHighContrast
 import com.neuronova.mimomento.ui.theme.ThemedCardAccentLine
 import com.neuronova.mimomento.ui.theme.themedCardBorder
 import com.neuronova.mimomento.ui.theme.themedCardColors
@@ -118,16 +120,17 @@ fun SettingsScreen(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.spacedBy(4.dp),
                     ) {
+                        val isHC = LocalHighContrast.current
                         Text(
                             text = currentThemeName,
                             style = MaterialTheme.typography.bodyMedium,
                             fontWeight = FontWeight.SemiBold,
-                            color = MaterialTheme.colorScheme.primary,
+                            color = if (isHC) Color(0xFFFFD600) else MaterialTheme.colorScheme.primary,
                         )
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
                             contentDescription = null,
-                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                            tint = if (isHC) Color(0xFFFFD600) else MaterialTheme.colorScheme.onSurfaceVariant,
                             modifier = Modifier.size(20.dp),
                         )
                     }
@@ -174,10 +177,11 @@ fun SettingsScreen(
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
                     }
+                    val isHC = LocalHighContrast.current
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
                         contentDescription = null,
-                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                        tint = if (isHC) Color(0xFFFFD600) else MaterialTheme.colorScheme.onSurfaceVariant,
                         modifier = Modifier.size(20.dp),
                     )
                 }
@@ -292,10 +296,11 @@ fun SettingsScreen(
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
                     }
+                    val isHC = LocalHighContrast.current
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
                         contentDescription = null,
-                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                        tint = if (isHC) Color(0xFFFFD600) else MaterialTheme.colorScheme.onSurfaceVariant,
                         modifier = Modifier.size(20.dp),
                     )
                 }
@@ -311,6 +316,7 @@ private fun SettingsSectionHeader(
     title: String,
     icon: androidx.compose.ui.graphics.vector.ImageVector,
 ) {
+    val isHC = LocalHighContrast.current
     Row(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -318,14 +324,14 @@ private fun SettingsSectionHeader(
         Icon(
             imageVector = icon,
             contentDescription = null,
-            tint = MaterialTheme.colorScheme.primary,
+            tint = if (isHC) Color(0xFFFFD600) else MaterialTheme.colorScheme.primary,
             modifier = Modifier.size(20.dp),
         )
         Text(
             text = title,
             style = MaterialTheme.typography.titleMedium,
             fontWeight = FontWeight.SemiBold,
-            color = MaterialTheme.colorScheme.onBackground,
+            color = if (isHC) Color(0xFFFFD600) else MaterialTheme.colorScheme.onBackground,
         )
     }
 }

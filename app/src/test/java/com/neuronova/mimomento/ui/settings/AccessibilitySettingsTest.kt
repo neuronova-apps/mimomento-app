@@ -6,6 +6,7 @@ import com.neuronova.mimomento.data.model.AccessibilitySettings
 import com.neuronova.mimomento.data.model.MiMomentoThemeCatalog
 import com.neuronova.mimomento.data.model.TextScale
 import com.neuronova.mimomento.data.repository.AccessibilityPreferencesRepository
+import androidx.compose.ui.graphics.Color
 import com.neuronova.mimomento.ui.navigation.MiMomentoDestinations
 import com.neuronova.mimomento.ui.navigation.shouldShowBottomBar
 import kotlinx.coroutines.flow.first
@@ -157,26 +158,108 @@ class AccessibilitySettingsTest {
         assertFalse(settings.reduceMotion)
     }
 
-    // --- 4. ALTO CONTRASTE PRESERVA IDENTIDAD DE TEMA ---
+    // --- 4. ALTO CONTRASTE VERDADERO Y TRANSFORMACIÓN DE TEMAS ---
 
     @Test
-    fun highContrast_preservesThemeIdentityAndIncreasesContrast() {
-        val themes = MiMomentoThemeCatalog.themes
-        assertEquals(5, themes.size)
-
-        themes.forEach { theme ->
+    fun highContrast_falsePreservesOriginalThemeVisuals() {
+        MiMomentoThemeCatalog.themes.forEach { theme ->
             val normalVisual = theme.visual
-            val highContrastVisual = theme.visual.toHighContrast()
-
-            // Preserves theme brand colors
-            assertEquals(normalVisual.primary, highContrastVisual.primary)
-            assertEquals(normalVisual.secondary, highContrastVisual.secondary)
-
-            // High contrast enhances readability
-            assertEquals(1.0f, highContrastVisual.cardColor.alpha, 0.01f)
-            assertTrue(highContrastVisual.overlayAlpha >= normalVisual.overlayAlpha)
-            assertTrue(highContrastVisual.decorativeAlpha >= normalVisual.decorativeAlpha)
+            assertEquals(normalVisual, theme.visual)
         }
+    }
+
+    @Test
+    fun highContrast_trueTransformsToStrictAccessiblePalette() {
+        MiMomentoThemeCatalog.themes.forEach { theme ->
+            val hcVisual = theme.visual.toHighContrast()
+
+            // 1. Surface and background are black
+            assertEquals(Color(0xFF000000), hcVisual.surface)
+            assertEquals(Color(0xFF000000), hcVisual.scrimColor)
+
+            // 2. cardColor is #101010
+            assertEquals(Color(0xFF101010), hcVisual.cardColor)
+            assertEquals(Color(0xFF101010), hcVisual.surfaceVariant)
+
+            // 3. Text primary and onSurface are white
+            assertEquals(Color(0xFFFFFFFF), hcVisual.onSurface)
+            assertEquals(Color(0xFFFFFFFF), hcVisual.onBackground)
+
+            // 4. Primary accessibility accent is #FFD600 (yellow)
+            assertEquals(Color(0xFFFFD600), hcVisual.primary)
+            assertEquals(Color(0xFFFFD600), hcVisual.buttonColor)
+            assertEquals(Color(0xFFFFD600), hcVisual.iconTint)
+
+            // 5. onPrimary / onButtonColor is black
+            assertEquals(Color(0xFF000000), hcVisual.onButtonColor)
+
+            // 6. Normal border / outline is white
+            assertEquals(Color(0xFFFFFFFF), hcVisual.borderColor)
+
+            // 7. Secondary is white
+            assertEquals(Color(0xFFFFFFFF), hcVisual.secondary)
+
+            // 8. Decorative alpha is 0 and overlayAlpha is 1.0f
+            assertEquals(0.0f, hcVisual.decorativeAlpha, 0.001f)
+            assertEquals(1.0f, hcVisual.overlayAlpha, 0.001f)
+        }
+    }
+
+    @Test
+    fun highContrast_preservesThemeIdentityAndRecoversWhenDisabled() {
+        MiMomentoThemeCatalog.themes.forEach { theme ->
+            // Simulate user having theme selected
+            val selectedTheme = theme
+            val originalVisual = selectedTheme.visual
+
+            // When HC is activated, the theme ID and definition identity remain unchanged
+            val hcVisual = selectedTheme.visual.toHighContrast()
+            assertEquals(selectedTheme.id, theme.id)
+            assertEquals(selectedTheme.backgroundRes, theme.backgroundRes)
+            assertEquals(Color(0xFFFFD600), hcVisual.primary)
+
+            // When HC is deactivated, original visual is fully intact
+            val restoredVisual = selectedTheme.visual
+            assertEquals(originalVisual.primary, restoredVisual.primary)
+            assertEquals(originalVisual.surface, restoredVisual.surface)
+            assertEquals(originalVisual.cardColor, restoredVisual.cardColor)
+            assertEquals(originalVisual.borderColor, restoredVisual.borderColor)
+            assertEquals(originalVisual, restoredVisual)
+        }
+    }
+
+    @Test
+    fun highContrast_worksSimultaneouslyWithAllTextScales() = runBlocking {
+        val repository = createRepository()
+
+        // 1. NORMAL + HC
+        repository.setTextScale(TextScale.NORMAL)
+        repository.setHighContrast(true)
+        var settings = repository.settingsFlow.first()
+        assertEquals(TextScale.NORMAL, settings.textScale)
+        assertTrue(settings.highContrast)
+        assertEquals(1.00f, settings.effectiveMultiplier, 0.001f)
+
+        // 2. LARGE + HC
+        repository.setTextScale(TextScale.LARGE)
+        settings = repository.settingsFlow.first()
+        assertEquals(TextScale.LARGE, settings.textScale)
+        assertTrue(settings.highContrast)
+        assertEquals(1.15f, settings.effectiveMultiplier, 0.001f)
+
+        // 3. VERY_LARGE + HC
+        repository.setTextScale(TextScale.VERY_LARGE)
+        settings = repository.settingsFlow.first()
+        assertEquals(TextScale.VERY_LARGE, settings.textScale)
+        assertTrue(settings.highContrast)
+        assertEquals(1.30f, settings.effectiveMultiplier, 0.001f)
+
+        // 4. Disable HC while maintaining VERY_LARGE
+        repository.setHighContrast(false)
+        settings = repository.settingsFlow.first()
+        assertEquals(TextScale.VERY_LARGE, settings.textScale)
+        assertFalse(settings.highContrast)
+        assertEquals(1.30f, settings.effectiveMultiplier, 0.001f)
     }
 
     // --- 5. NAVEGACIÓN Y BACKSTACK ---

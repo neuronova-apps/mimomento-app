@@ -51,11 +51,16 @@ import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.ui.graphics.Color
 import com.neuronova.mimomento.R
 import com.neuronova.mimomento.data.model.TextScale
+import com.neuronova.mimomento.ui.theme.LocalHighContrast
 import com.neuronova.mimomento.ui.theme.ThemedCardAccentLine
 import com.neuronova.mimomento.ui.theme.themedCardBorder
 import com.neuronova.mimomento.ui.theme.themedCardColors
+import com.neuronova.mimomento.ui.theme.themedRadioButtonColors
+import com.neuronova.mimomento.ui.theme.themedSwitchColors
 
 @Composable
 fun AccessibilityScreen(
@@ -186,22 +191,24 @@ fun AccessibilityContent(
                     Spacer(modifier = Modifier.height(12.dp))
 
                     // Vista previa del tamaño de texto
+                    val isHC = LocalHighContrast.current
                     Text(
                         text = stringResource(R.string.accessibility_preview_title),
                         style = MaterialTheme.typography.labelMedium,
                         fontWeight = FontWeight.SemiBold,
-                        color = MaterialTheme.colorScheme.primary,
+                        color = if (isHC) Color(0xFFFFD600) else MaterialTheme.colorScheme.primary,
                     )
                     Spacer(modifier = Modifier.height(6.dp))
                     Surface(
                         modifier = Modifier.fillMaxWidth(),
                         shape = MaterialTheme.shapes.small,
-                        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
+                        color = if (isHC) Color.Black else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
+                        border = if (isHC) BorderStroke(2.dp, Color.White) else null,
                     ) {
                         Text(
                             text = stringResource(R.string.accessibility_preview_sample),
                             style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurface,
+                            color = if (isHC) Color.White else MaterialTheme.colorScheme.onSurface,
                             modifier = Modifier.padding(12.dp),
                         )
                     }
@@ -255,6 +262,7 @@ fun AccessibilityContent(
                         Switch(
                             checked = uiState.highContrast,
                             onCheckedChange = onHighContrastChange,
+                            colors = themedSwitchColors(),
                         )
                     }
                 }
@@ -307,6 +315,7 @@ fun AccessibilityContent(
                         Switch(
                             checked = uiState.reduceMotion,
                             onCheckedChange = onReduceMotionChange,
+                            colors = themedSwitchColors(),
                         )
                     }
                 }
@@ -329,16 +338,17 @@ fun AccessibilityContent(
                     horizontalArrangement = Arrangement.spacedBy(12.dp),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
+                    val isHC = LocalHighContrast.current
                     Icon(
                         imageVector = Icons.Default.Info,
                         contentDescription = null,
-                        tint = MaterialTheme.colorScheme.primary,
+                        tint = if (isHC) Color(0xFFFFD600) else MaterialTheme.colorScheme.primary,
                         modifier = Modifier.size(24.dp),
                     )
                     Text(
                         text = stringResource(R.string.accessibility_info_system),
                         style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        color = if (isHC) Color(0xFFF2F2F2) else MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                 }
             }
@@ -356,10 +366,19 @@ private fun TextScaleOptionRow(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val borderColor = if (isSelected) {
-        MaterialTheme.colorScheme.primary
+    val isHC = LocalHighContrast.current
+    val borderColor = if (isHC) {
+        if (isSelected) Color(0xFFFFD600) else Color.White
     } else {
-        MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
+        if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
+    }
+    val strokeWidth = if (isHC) 2.dp else if (isSelected) 2.dp else 1.dp
+    val surfaceColor = if (isHC) {
+        Color.Black
+    } else if (isSelected) {
+        MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.25f)
+    } else {
+        MaterialTheme.colorScheme.surface
     }
 
     Surface(
@@ -368,7 +387,7 @@ private fun TextScaleOptionRow(
             .heightIn(min = 48.dp)
             .clip(MaterialTheme.shapes.small)
             .border(
-                width = if (isSelected) 2.dp else 1.dp,
+                width = strokeWidth,
                 color = borderColor,
                 shape = MaterialTheme.shapes.small,
             )
@@ -377,11 +396,7 @@ private fun TextScaleOptionRow(
                 onClick = onClick,
                 role = Role.RadioButton,
             ),
-        color = if (isSelected) {
-            MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.25f)
-        } else {
-            MaterialTheme.colorScheme.surface
-        },
+        color = surfaceColor,
     ) {
         Row(
             modifier = Modifier
@@ -398,12 +413,13 @@ private fun TextScaleOptionRow(
                     selected = isSelected,
                     onClick = null, // Handled by parent selectable
                     modifier = Modifier.size(20.dp),
+                    colors = themedRadioButtonColors(),
                 )
                 Text(
                     text = label,
                     style = MaterialTheme.typography.bodyLarge,
                     fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
-                    color = MaterialTheme.colorScheme.onSurface,
+                    color = if (isHC) Color.White else MaterialTheme.colorScheme.onSurface,
                 )
             }
 
@@ -417,7 +433,11 @@ private fun TextScaleOptionRow(
                 text = factorText,
                 style = MaterialTheme.typography.labelMedium,
                 fontWeight = FontWeight.SemiBold,
-                color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
+                color = if (isHC) {
+                    if (isSelected) Color(0xFFFFD600) else Color.White
+                } else {
+                    if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
+                },
             )
         }
     }
@@ -428,6 +448,7 @@ private fun AccessibilitySectionHeader(
     title: String,
     icon: androidx.compose.ui.graphics.vector.ImageVector,
 ) {
+    val isHC = LocalHighContrast.current
     Row(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -435,14 +456,14 @@ private fun AccessibilitySectionHeader(
         Icon(
             imageVector = icon,
             contentDescription = null,
-            tint = MaterialTheme.colorScheme.primary,
+            tint = if (isHC) Color(0xFFFFD600) else MaterialTheme.colorScheme.primary,
             modifier = Modifier.size(20.dp),
         )
         Text(
             text = title,
             style = MaterialTheme.typography.titleMedium,
             fontWeight = FontWeight.SemiBold,
-            color = MaterialTheme.colorScheme.onBackground,
+            color = if (isHC) Color(0xFFFFD600) else MaterialTheme.colorScheme.onBackground,
             modifier = Modifier.semantics { heading() },
         )
     }

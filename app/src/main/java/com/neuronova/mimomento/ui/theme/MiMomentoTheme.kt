@@ -13,11 +13,18 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.ButtonColors
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CardColors
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.RadioButtonColors
+import androidx.compose.material3.RadioButtonDefaults
+import androidx.compose.material3.SwitchColors
+import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -57,32 +64,61 @@ fun MiMomentoTheme(
         if (highContrast) theme.copy(visual = effectiveVisual) else theme
     }
 
-    val colorScheme = lightColorScheme(
-        primary = effectiveVisual.primary,
-        onPrimary = effectiveVisual.onButtonColor,
-        primaryContainer = effectiveVisual.surfaceVariant,
-        onPrimaryContainer = effectiveVisual.primary,
-        secondary = effectiveVisual.secondary,
-        onSecondary = Color.White,
-        secondaryContainer = effectiveVisual.surfaceVariant,
-        onSecondaryContainer = effectiveVisual.secondary,
-        tertiary = effectiveVisual.secondary,
-        onTertiary = Color.White,
-        tertiaryContainer = effectiveVisual.surfaceVariant.copy(alpha = 0.7f),
-        onTertiaryContainer = effectiveVisual.primary,
-        background = Color.Transparent,
-        onBackground = effectiveVisual.onBackground,
-        surface = effectiveVisual.surface,
-        onSurface = effectiveVisual.onSurface,
-        surfaceVariant = effectiveVisual.surfaceVariant,
-        onSurfaceVariant = if (highContrast) effectiveVisual.onSurface.copy(alpha = 0.95f) else effectiveVisual.onSurface.copy(alpha = 0.72f),
-        surfaceContainer = effectiveVisual.cardColor,
-        surfaceContainerLow = effectiveVisual.cardColor,
-        surfaceContainerHigh = effectiveVisual.surfaceVariant,
-        surfaceContainerHighest = effectiveVisual.surfaceVariant,
-        outline = effectiveVisual.borderColor,
-        outlineVariant = if (highContrast) effectiveVisual.borderColor.copy(alpha = 0.75f) else effectiveVisual.borderColor.copy(alpha = 0.4f),
-    )
+    val colorScheme = if (highContrast) {
+        darkColorScheme(
+            primary = Color(0xFFFFD600),
+            onPrimary = Color.Black,
+            primaryContainer = Color(0xFF101010),
+            onPrimaryContainer = Color(0xFFFFD600),
+            secondary = Color.White,
+            onSecondary = Color.Black,
+            secondaryContainer = Color(0xFF101010),
+            onSecondaryContainer = Color.White,
+            tertiary = Color(0xFFFFD600),
+            onTertiary = Color.Black,
+            tertiaryContainer = Color(0xFF101010),
+            onTertiaryContainer = Color(0xFFFFD600),
+            background = Color.Black,
+            onBackground = Color.White,
+            surface = Color.Black,
+            onSurface = Color.White,
+            surfaceVariant = Color(0xFF101010),
+            onSurfaceVariant = Color(0xFFF2F2F2),
+            surfaceContainer = Color(0xFF101010),
+            surfaceContainerLow = Color.Black,
+            surfaceContainerHigh = Color(0xFF101010),
+            surfaceContainerHighest = Color(0xFF101010),
+            outline = Color.White,
+            outlineVariant = Color.White,
+        )
+    } else {
+        lightColorScheme(
+            primary = effectiveVisual.primary,
+            onPrimary = effectiveVisual.onButtonColor,
+            primaryContainer = effectiveVisual.surfaceVariant,
+            onPrimaryContainer = effectiveVisual.primary,
+            secondary = effectiveVisual.secondary,
+            onSecondary = Color.White,
+            secondaryContainer = effectiveVisual.surfaceVariant,
+            onSecondaryContainer = effectiveVisual.secondary,
+            tertiary = effectiveVisual.secondary,
+            onTertiary = Color.White,
+            tertiaryContainer = effectiveVisual.surfaceVariant.copy(alpha = 0.7f),
+            onTertiaryContainer = effectiveVisual.primary,
+            background = Color.Transparent,
+            onBackground = effectiveVisual.onBackground,
+            surface = effectiveVisual.surface,
+            onSurface = effectiveVisual.onSurface,
+            surfaceVariant = effectiveVisual.surfaceVariant,
+            onSurfaceVariant = effectiveVisual.onSurface.copy(alpha = 0.72f),
+            surfaceContainer = effectiveVisual.cardColor,
+            surfaceContainerLow = effectiveVisual.cardColor,
+            surfaceContainerHigh = effectiveVisual.surfaceVariant,
+            surfaceContainerHighest = effectiveVisual.surfaceVariant,
+            outline = effectiveVisual.borderColor,
+            outlineVariant = effectiveVisual.borderColor.copy(alpha = 0.4f),
+        )
+    }
 
     val view = LocalView.current
     if (!view.isInEditMode) {
@@ -91,12 +127,22 @@ fun MiMomentoTheme(
             val window = activity.window
             val insetsController = WindowCompat.getInsetsController(window, view)
 
-            window.statusBarColor = effectiveVisual.surface.toArgb()
-            insetsController.isAppearanceLightStatusBars = true
+            if (highContrast) {
+                window.statusBarColor = Color.Black.toArgb()
+                insetsController.isAppearanceLightStatusBars = false
 
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
-                window.navigationBarColor = effectiveVisual.cardColor.toArgb()
-                insetsController.isAppearanceLightNavigationBars = true
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
+                    window.navigationBarColor = Color.Black.toArgb()
+                    insetsController.isAppearanceLightNavigationBars = false
+                }
+            } else {
+                window.statusBarColor = effectiveVisual.surface.toArgb()
+                insetsController.isAppearanceLightStatusBars = true
+
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
+                    window.navigationBarColor = effectiveVisual.cardColor.toArgb()
+                    insetsController.isAppearanceLightNavigationBars = true
+                }
             }
         }
     }
@@ -125,8 +171,18 @@ private tailrec fun Context.findActivity(): Activity? = when (this) {
 @Composable
 fun ThemedCardAccentLine(
     modifier: Modifier = Modifier,
-    alpha: Float = if (LocalHighContrast.current) 0.95f else 0.6f,
+    alpha: Float = if (LocalHighContrast.current) 1.0f else 0.6f,
 ) {
+    if (LocalHighContrast.current) {
+        Box(
+            modifier = modifier
+                .fillMaxWidth()
+                .height(2.5.dp)
+                .background(Color(0xFFFFD600)),
+        )
+        return
+    }
+
     val theme = LocalActiveTheme.current
     when (theme.accentStyle) {
         "SKY_CELESTIAL_ACCENT" -> {
@@ -266,17 +322,110 @@ fun ThemedCardAccentLine(
 }
 
 @Composable
-fun themedCardColors(): CardColors = CardDefaults.cardColors(
-    containerColor = LocalActiveTheme.current.visual.cardColor,
-    contentColor = MaterialTheme.colorScheme.onSurface,
-)
+fun themedCardColors(): CardColors {
+    val isHighContrast = LocalHighContrast.current
+    return CardDefaults.cardColors(
+        containerColor = if (isHighContrast) Color(0xFF101010) else LocalActiveTheme.current.visual.cardColor,
+        contentColor = if (isHighContrast) Color.White else MaterialTheme.colorScheme.onSurface,
+    )
+}
 
 @Composable
 fun themedCardBorder(isSelected: Boolean = false): BorderStroke {
     val isHighContrast = LocalHighContrast.current
-    val strokeWidth = if (isSelected) 2.dp else if (isHighContrast) 1.5.dp else 1.dp
-    val color = if (isSelected) MaterialTheme.colorScheme.primary else LocalActiveTheme.current.visual.borderColor
+    val strokeWidth = if (isHighContrast) 2.dp else if (isSelected) 2.dp else 1.dp
+    val color = if (isHighContrast) {
+        if (isSelected) Color(0xFFFFD600) else Color.White
+    } else {
+        if (isSelected) MaterialTheme.colorScheme.primary else LocalActiveTheme.current.visual.borderColor
+    }
     return BorderStroke(width = strokeWidth, color = color)
+}
+
+@Composable
+fun themedSwitchColors(): SwitchColors {
+    val isHighContrast = LocalHighContrast.current
+    return if (isHighContrast) {
+        SwitchDefaults.colors(
+            checkedThumbColor = Color.Black,
+            checkedTrackColor = Color(0xFFFFD600),
+            checkedBorderColor = Color(0xFFFFD600),
+            uncheckedThumbColor = Color.White,
+            uncheckedTrackColor = Color(0xFF101010),
+            uncheckedBorderColor = Color.White,
+            disabledCheckedThumbColor = Color(0xFF101010),
+            disabledCheckedTrackColor = Color(0xFF887700),
+            disabledCheckedBorderColor = Color(0xFF887700),
+            disabledUncheckedThumbColor = Color(0xFF888888),
+            disabledUncheckedTrackColor = Color.Black,
+            disabledUncheckedBorderColor = Color(0xFF888888),
+        )
+    } else {
+        SwitchDefaults.colors(
+            checkedThumbColor = Color.White,
+            checkedTrackColor = MaterialTheme.colorScheme.primary,
+            uncheckedThumbColor = MaterialTheme.colorScheme.outline,
+            uncheckedTrackColor = MaterialTheme.colorScheme.surfaceVariant,
+        )
+    }
+}
+
+@Composable
+fun themedRadioButtonColors(): RadioButtonColors {
+    val isHighContrast = LocalHighContrast.current
+    return if (isHighContrast) {
+        RadioButtonDefaults.colors(
+            selectedColor = Color(0xFFFFD600),
+            unselectedColor = Color.White,
+            disabledSelectedColor = Color(0xFF887700),
+            disabledUnselectedColor = Color(0xFF888888),
+        )
+    } else {
+        RadioButtonDefaults.colors()
+    }
+}
+
+@Composable
+fun themedButtonColors(): ButtonColors {
+    val isHighContrast = LocalHighContrast.current
+    return if (isHighContrast) {
+        ButtonDefaults.buttonColors(
+            containerColor = Color(0xFFFFD600),
+            contentColor = Color.Black,
+            disabledContainerColor = Color(0xFF887700),
+            disabledContentColor = Color(0xFF222222),
+        )
+    } else {
+        ButtonDefaults.buttonColors(
+            containerColor = MaterialTheme.colorScheme.primary,
+            contentColor = MaterialTheme.colorScheme.onPrimary,
+        )
+    }
+}
+
+@Composable
+fun themedOutlinedButtonColors(): ButtonColors {
+    val isHighContrast = LocalHighContrast.current
+    return if (isHighContrast) {
+        ButtonDefaults.outlinedButtonColors(
+            containerColor = Color.Black,
+            contentColor = Color.White,
+            disabledContainerColor = Color.Black,
+            disabledContentColor = Color(0xFF888888),
+        )
+    } else {
+        ButtonDefaults.outlinedButtonColors()
+    }
+}
+
+@Composable
+fun themedOutlinedButtonBorder(): BorderStroke {
+    val isHighContrast = LocalHighContrast.current
+    return if (isHighContrast) {
+        BorderStroke(2.dp, Color.White)
+    } else {
+        BorderStroke(1.dp, MaterialTheme.colorScheme.outline)
+    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
