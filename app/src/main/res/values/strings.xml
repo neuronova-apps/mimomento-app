@@ -239,4 +239,23 @@
     <string name="progress_section_monthly">Actividad este mes</string>
     <string name="progress_monthly_active_format">%1$d días activos en el mes</string>
     <string name="progress_monthly_events_format">%1$d momentos registrados</string>
+
+    <!-- Home Dynamic Sections -->
+    <string name="home_section_moment_today">Tu momento de hoy</string>
+    <string name="home_moment_today_empty_title">Aún no has escrito hoy</string>
+    <string name="home_moment_today_empty_desc">Puedes guardar una reflexión de tu día.</string>
+    <string name="home_moment_today_action_write">Escribir ahora</string>
+    <string name="home_moment_today_recorded_title">Ya registraste un momento hoy</string>
+    <string name="home_moment_today_entry_single">1 entrada en tu Diario</string>
+    <string name="home_moment_today_entries_multiple">%1$d entradas en tu Diario</string>
+    <string name="home_moment_today_action_view">Ver Diario</string>
+    <string name="home_section_this_week">Esta semana</string>
+    <string name="home_weekly_active_day_single">1 día activo</string>
+    <string name="home_weekly_active_days_multiple">%1$d días activos</string>
+    <string name="home_weekly_devotional_single">1 devocional</string>
+    <string name="home_weekly_devotionals_multiple">%1$d devocionales</string>
+    <string name="home_weekly_journal_single">1 entrada en Diario</string>
+    <string name="home_weekly_journals_multiple">%1$d entradas en Diario</string>
+    <string name="home_weekly_empty_activity">Sin actividad registrada esta semana</string>
+    <string name="home_weekly_action_view_progress">Ver progreso</string>
 </resources>
