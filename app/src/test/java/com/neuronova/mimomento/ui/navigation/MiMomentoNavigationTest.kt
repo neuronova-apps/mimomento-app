@@ -18,6 +18,7 @@ class MiMomentoNavigationTest {
         assertEquals("settings", MiMomentoDestinations.SETTINGS)
         assertEquals("settings/themes", MiMomentoDestinations.THEMES)
         assertEquals("settings/about", MiMomentoDestinations.ABOUT)
+        assertEquals("settings/accessibility", MiMomentoDestinations.ACCESSIBILITY)
         assertEquals("devotionals/{devotionalId}", MiMomentoDestinations.DEVOTIONAL_DETAIL_ROUTE)
     }
 
@@ -268,6 +269,44 @@ class MiMomentoNavigationTest {
         assertTrue("About suppresses bottom bar", !shouldShowBottomBar(backStack.last()))
 
         // User presses back from About:
+        backStack.removeAt(backStack.size - 1)
+        assertEquals(listOf(MiMomentoDestinations.HOME, MiMomentoDestinations.SETTINGS), backStack)
+
+        // User presses back from Settings:
+        backStack.removeAt(backStack.size - 1)
+        assertEquals(listOf(MiMomentoDestinations.HOME), backStack)
+        assertTrue("Home shows bottom bar", shouldShowBottomBar(backStack.last()))
+    }
+
+    @Test
+    fun accessibilityRoute_isCanonicalAndNotTopLevelTab() {
+        assertEquals("settings/accessibility", MiMomentoDestinations.ACCESSIBILITY)
+        assertTrue(
+            "Accessibility must NOT be in top-level bottom navigation destinations",
+            TOP_LEVEL_DESTINATIONS.none { it.route == MiMomentoDestinations.ACCESSIBILITY },
+        )
+    }
+
+    @Test
+    fun accessibilityScreen_suppressesBottomNavigationBar() {
+        assertTrue(
+            "Accessibility route must hide bottom navigation bar",
+            !shouldShowBottomBar(MiMomentoDestinations.ACCESSIBILITY),
+        )
+    }
+
+    @Test
+    fun settingsToAccessibility_operatesOnStandardBackStack() {
+        val backStack = mutableListOf(MiMomentoDestinations.HOME, MiMomentoDestinations.SETTINGS)
+        // User taps Accessibility row in Settings:
+        backStack.add(MiMomentoDestinations.ACCESSIBILITY)
+        assertEquals(
+            listOf(MiMomentoDestinations.HOME, MiMomentoDestinations.SETTINGS, MiMomentoDestinations.ACCESSIBILITY),
+            backStack,
+        )
+        assertTrue("Accessibility suppresses bottom bar", !shouldShowBottomBar(backStack.last()))
+
+        // User presses back from Accessibility:
         backStack.removeAt(backStack.size - 1)
         assertEquals(listOf(MiMomentoDestinations.HOME, MiMomentoDestinations.SETTINGS), backStack)
 

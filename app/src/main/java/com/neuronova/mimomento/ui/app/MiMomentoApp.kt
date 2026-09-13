@@ -11,6 +11,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -20,10 +21,15 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.neuronova.mimomento.data.repository.AccessibilityPreferencesRepository
+import com.neuronova.mimomento.ui.settings.AccessibilityUiState
+import com.neuronova.mimomento.ui.settings.AccessibilityViewModel
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
@@ -62,6 +68,7 @@ import java.io.File
 fun MiMomentoApp(
     repository: MiMomentoContentRepository,
     themeRepository: ThemePreferencesRepository? = null,
+    accessibilityRepository: AccessibilityPreferencesRepository? = null,
     journalRepository: JournalRepository? = null,
     progressRepository: ProgressRepository? = null,
     availabilityPolicy: ThemeAvailabilityPolicy = DefaultThemeAvailabilityPolicy(),
@@ -81,6 +88,9 @@ fun MiMomentoApp(
     homeViewModel: HomeViewModel? = null,
     themeViewModel: ThemeViewModel? = themeRepository?.let {
         viewModel(factory = ThemeViewModel.provideFactory(it, availabilityPolicy, previewPolicy))
+    },
+    accessibilityViewModel: AccessibilityViewModel? = accessibilityRepository?.let {
+        viewModel(factory = AccessibilityViewModel.provideFactory(it))
     },
     navController: NavHostController = rememberNavController(),
 ) {
@@ -115,10 +125,25 @@ fun MiMomentoApp(
     val themeUiState by themeViewModel?.uiState?.collectAsState() ?: remember {
         mutableStateOf(ThemeUiState())
     }
+    val accessibilityUiState by accessibilityViewModel?.uiState?.collectAsState() ?: remember {
+        mutableStateOf(AccessibilityUiState())
+    }
     val activeTheme = themeUiState.activeTheme
 
-    MiMomentoTheme(theme = activeTheme) {
-        ThemedBackground(theme = activeTheme) {
+    val currentDensity = LocalDensity.current
+    val effectiveDensity = remember(currentDensity, accessibilityUiState.textScale) {
+        Density(
+            density = currentDensity.density,
+            fontScale = currentDensity.fontScale * accessibilityUiState.effectiveMultiplier,
+        )
+    }
+
+    CompositionLocalProvider(LocalDensity provides effectiveDensity) {
+        MiMomentoTheme(
+            theme = activeTheme,
+            highContrast = accessibilityUiState.highContrast,
+        ) {
+            ThemedBackground(theme = activeTheme) {
             when (val state = contentState) {
                 AppContentUiState.Loading -> {
                     LoadingView()
@@ -203,6 +228,7 @@ fun MiMomentoApp(
                             homeViewModel = effectiveHomeViewModel,
                             progressRepository = effectiveProgressRepository,
                             themeViewModel = themeViewModel,
+                            accessibilityViewModel = accessibilityViewModel,
                             devotionalCount = state.devotionalCount,
                             onNavigateToDevotionals = {
                                 navController.navigate(MiMomentoDestinations.DEVOTIONALS) {
@@ -220,4 +246,5 @@ fun MiMomentoApp(
             }
         }
     }
+}
 }

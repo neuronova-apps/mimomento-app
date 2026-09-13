@@ -22,6 +22,8 @@ import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.compositionLocalOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
@@ -40,36 +42,46 @@ val LocalActiveTheme = staticCompositionLocalOf<MiMomentoThemeDefinition> {
     MiMomentoThemeCatalog.DEFAULT_THEME
 }
 
+val LocalHighContrast = compositionLocalOf { false }
+
 @Composable
 fun MiMomentoTheme(
     theme: MiMomentoThemeDefinition = MiMomentoThemeCatalog.DEFAULT_THEME,
+    highContrast: Boolean = false,
     content: @Composable () -> Unit,
 ) {
+    val effectiveVisual = remember(theme, highContrast) {
+        if (highContrast) theme.visual.toHighContrast() else theme.visual
+    }
+    val effectiveTheme = remember(theme, effectiveVisual, highContrast) {
+        if (highContrast) theme.copy(visual = effectiveVisual) else theme
+    }
+
     val colorScheme = lightColorScheme(
-        primary = theme.visual.primary,
-        onPrimary = theme.visual.onButtonColor,
-        primaryContainer = theme.visual.surfaceVariant,
-        onPrimaryContainer = theme.visual.primary,
-        secondary = theme.visual.secondary,
+        primary = effectiveVisual.primary,
+        onPrimary = effectiveVisual.onButtonColor,
+        primaryContainer = effectiveVisual.surfaceVariant,
+        onPrimaryContainer = effectiveVisual.primary,
+        secondary = effectiveVisual.secondary,
         onSecondary = Color.White,
-        secondaryContainer = theme.visual.surfaceVariant,
-        onSecondaryContainer = theme.visual.secondary,
-        tertiary = theme.visual.secondary,
+        secondaryContainer = effectiveVisual.surfaceVariant,
+        onSecondaryContainer = effectiveVisual.secondary,
+        tertiary = effectiveVisual.secondary,
         onTertiary = Color.White,
-        tertiaryContainer = theme.visual.surfaceVariant.copy(alpha = 0.7f),
-        onTertiaryContainer = theme.visual.primary,
+        tertiaryContainer = effectiveVisual.surfaceVariant.copy(alpha = 0.7f),
+        onTertiaryContainer = effectiveVisual.primary,
         background = Color.Transparent,
-        onBackground = theme.visual.onBackground,
-        surface = theme.visual.surface,
-        onSurface = theme.visual.onSurface,
-        surfaceVariant = theme.visual.surfaceVariant,
-        onSurfaceVariant = theme.visual.onSurface.copy(alpha = 0.72f),
-        surfaceContainer = theme.visual.cardColor,
-        surfaceContainerLow = theme.visual.cardColor,
-        surfaceContainerHigh = theme.visual.surfaceVariant,
-        surfaceContainerHighest = theme.visual.surfaceVariant,
-        outline = theme.visual.borderColor,
-        outlineVariant = theme.visual.borderColor.copy(alpha = 0.4f),
+        onBackground = effectiveVisual.onBackground,
+        surface = effectiveVisual.surface,
+        onSurface = effectiveVisual.onSurface,
+        surfaceVariant = effectiveVisual.surfaceVariant,
+        onSurfaceVariant = if (highContrast) effectiveVisual.onSurface.copy(alpha = 0.95f) else effectiveVisual.onSurface.copy(alpha = 0.72f),
+        surfaceContainer = effectiveVisual.cardColor,
+        surfaceContainerLow = effectiveVisual.cardColor,
+        surfaceContainerHigh = effectiveVisual.surfaceVariant,
+        surfaceContainerHighest = effectiveVisual.surfaceVariant,
+        outline = effectiveVisual.borderColor,
+        outlineVariant = if (highContrast) effectiveVisual.borderColor.copy(alpha = 0.75f) else effectiveVisual.borderColor.copy(alpha = 0.4f),
     )
 
     val view = LocalView.current
@@ -79,17 +91,20 @@ fun MiMomentoTheme(
             val window = activity.window
             val insetsController = WindowCompat.getInsetsController(window, view)
 
-            window.statusBarColor = theme.visual.surface.toArgb()
+            window.statusBarColor = effectiveVisual.surface.toArgb()
             insetsController.isAppearanceLightStatusBars = true
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
-                window.navigationBarColor = theme.visual.cardColor.toArgb()
+                window.navigationBarColor = effectiveVisual.cardColor.toArgb()
                 insetsController.isAppearanceLightNavigationBars = true
             }
         }
     }
 
-    CompositionLocalProvider(LocalActiveTheme provides theme) {
+    CompositionLocalProvider(
+        LocalActiveTheme provides effectiveTheme,
+        LocalHighContrast provides highContrast,
+    ) {
         MaterialTheme(
             colorScheme = colorScheme,
             content = content,
@@ -110,7 +125,7 @@ private tailrec fun Context.findActivity(): Activity? = when (this) {
 @Composable
 fun ThemedCardAccentLine(
     modifier: Modifier = Modifier,
-    alpha: Float = 0.6f,
+    alpha: Float = if (LocalHighContrast.current) 0.95f else 0.6f,
 ) {
     val theme = LocalActiveTheme.current
     when (theme.accentStyle) {
@@ -257,10 +272,12 @@ fun themedCardColors(): CardColors = CardDefaults.cardColors(
 )
 
 @Composable
-fun themedCardBorder(isSelected: Boolean = false): BorderStroke = BorderStroke(
-    width = if (isSelected) 2.dp else 1.dp,
-    color = if (isSelected) MaterialTheme.colorScheme.primary else LocalActiveTheme.current.visual.borderColor,
-)
+fun themedCardBorder(isSelected: Boolean = false): BorderStroke {
+    val isHighContrast = LocalHighContrast.current
+    val strokeWidth = if (isSelected) 2.dp else if (isHighContrast) 1.5.dp else 1.dp
+    val color = if (isSelected) MaterialTheme.colorScheme.primary else LocalActiveTheme.current.visual.borderColor
+    return BorderStroke(width = strokeWidth, color = color)
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

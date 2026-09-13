@@ -28,6 +28,8 @@ import com.neuronova.mimomento.ui.prayers.SpiritualMomentDetailScreen
 import com.neuronova.mimomento.ui.progress.ProgressScreen
 import com.neuronova.mimomento.ui.progress.ProgressViewModel
 import com.neuronova.mimomento.ui.settings.AboutScreen
+import com.neuronova.mimomento.ui.settings.AccessibilityScreen
+import com.neuronova.mimomento.ui.settings.AccessibilityViewModel
 import com.neuronova.mimomento.ui.settings.SettingsScreen
 import com.neuronova.mimomento.ui.journal.JournalViewModel
 import com.neuronova.mimomento.ui.settings.ThemesScreen
@@ -45,6 +47,7 @@ fun MiMomentoNavHost(
     modifier: Modifier = Modifier,
     startDestination: String = MiMomentoDestinations.START_DESTINATION,
     themeViewModel: ThemeViewModel? = null,
+    accessibilityViewModel: AccessibilityViewModel? = null,
     journalViewModel: JournalViewModel? = null,
     progressViewModel: ProgressViewModel? = null,
     homeViewModel: HomeViewModel? = null,
@@ -116,6 +119,7 @@ fun MiMomentoNavHost(
                 onNavigateUp = { navController.navigateUp() },
                 onNavigateToThemes = { navController.navigate(MiMomentoDestinations.THEMES) },
                 onNavigateToAbout = { navController.navigate(MiMomentoDestinations.ABOUT) },
+                onNavigateToAccessibility = { navController.navigate(MiMomentoDestinations.ACCESSIBILITY) },
                 currentThemeName = currentThemeName,
             )
         }
@@ -133,6 +137,15 @@ fun MiMomentoNavHost(
             AboutScreen(
                 onNavigateUp = { navController.navigateUp() },
             )
+        }
+
+        composable(route = MiMomentoDestinations.ACCESSIBILITY) {
+            if (accessibilityViewModel != null) {
+                AccessibilityScreen(
+                    viewModel = accessibilityViewModel,
+                    onNavigateUp = { navController.navigateUp() },
+                )
+            }
         }
 
         composable(route = MiMomentoDestinations.DEVOTIONALS) {

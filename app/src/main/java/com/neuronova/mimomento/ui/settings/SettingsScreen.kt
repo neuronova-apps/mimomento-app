@@ -46,6 +46,7 @@ fun SettingsScreen(
     onNavigateUp: () -> Unit,
     onNavigateToThemes: () -> Unit = {},
     onNavigateToAbout: () -> Unit = {},
+    onNavigateToAccessibility: () -> Unit = {},
     currentThemeName: String = stringResource(R.string.theme_sky),
     modifier: Modifier = Modifier,
 ) {
@@ -135,35 +136,49 @@ fun SettingsScreen(
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            // 2. Sección: Accesibilidad (Informativa sobre tamaño de fuente del sistema)
+            // 2. Sección: Accesibilidad (Fila navegable a AccessibilityScreen)
             SettingsSectionHeader(
                 title = stringResource(R.string.settings_accessibility),
                 icon = Icons.Default.Accessibility,
             )
             Spacer(modifier = Modifier.height(8.dp))
             Card(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable(onClick = onNavigateToAccessibility),
                 shape = MaterialTheme.shapes.medium,
                 colors = themedCardColors(),
                 border = themedCardBorder(),
             ) {
                 ThemedCardAccentLine()
-                Column(
+                Row(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(16.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically,
                 ) {
-                    Text(
-                        text = stringResource(R.string.settings_text_size),
-                        style = MaterialTheme.typography.bodyLarge,
-                        fontWeight = FontWeight.SemiBold,
-                        color = MaterialTheme.colorScheme.onSurface,
-                    )
-                    Spacer(modifier = Modifier.height(4.dp))
-                    Text(
-                        text = stringResource(R.string.settings_accessibility_text_size_info),
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    Column(
+                        modifier = Modifier.weight(1f),
+                        verticalArrangement = Arrangement.spacedBy(4.dp),
+                    ) {
+                        Text(
+                            text = stringResource(R.string.settings_accessibility),
+                            style = MaterialTheme.typography.bodyLarge,
+                            fontWeight = FontWeight.SemiBold,
+                            color = MaterialTheme.colorScheme.onSurface,
+                        )
+                        Text(
+                            text = stringResource(R.string.settings_accessibility_row_desc),
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    }
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.size(20.dp),
                     )
                 }
             }

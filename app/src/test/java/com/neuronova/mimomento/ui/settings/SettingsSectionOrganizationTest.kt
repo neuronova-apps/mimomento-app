@@ -14,19 +14,21 @@ import org.junit.Test
 class SettingsSectionOrganizationTest {
 
     @Test
-    fun settingsThemesAndAbout_canonicalDestinationsExist() {
+    fun settingsThemesAboutAndAccessibility_canonicalDestinationsExist() {
         assertEquals("settings", MiMomentoDestinations.SETTINGS)
         assertEquals("settings/themes", MiMomentoDestinations.THEMES)
         assertEquals("settings/about", MiMomentoDestinations.ABOUT)
+        assertEquals("settings/accessibility", MiMomentoDestinations.ACCESSIBILITY)
 
-        // Neither Settings, Themes nor About are top-level bottom-nav tabs
+        // Neither Settings, Themes, About nor Accessibility are top-level bottom-nav tabs
         assertTrue(TOP_LEVEL_DESTINATIONS.none { it.route == MiMomentoDestinations.SETTINGS })
         assertTrue(TOP_LEVEL_DESTINATIONS.none { it.route == MiMomentoDestinations.THEMES })
         assertTrue(TOP_LEVEL_DESTINATIONS.none { it.route == MiMomentoDestinations.ABOUT })
+        assertTrue(TOP_LEVEL_DESTINATIONS.none { it.route == MiMomentoDestinations.ACCESSIBILITY })
     }
 
     @Test
-    fun bottomBarSuppressed_onSettingsThemesAndAboutRoutes() {
+    fun bottomBarSuppressed_onSettingsThemesAboutAndAccessibilityRoutes() {
         assertFalse(
             "Settings must suppress bottom navigation bar",
             shouldShowBottomBar(MiMomentoDestinations.SETTINGS),
@@ -38,6 +40,10 @@ class SettingsSectionOrganizationTest {
         assertFalse(
             "About must suppress bottom navigation bar",
             shouldShowBottomBar(MiMomentoDestinations.ABOUT),
+        )
+        assertFalse(
+            "Accessibility must suppress bottom navigation bar",
+            shouldShowBottomBar(MiMomentoDestinations.ACCESSIBILITY),
         )
     }
 
@@ -85,11 +91,11 @@ class SettingsSectionOrganizationTest {
 
         // Functional responsibility isolation:
         // - APARIENCIA: Handles theme selection and visual presentation
-        // - ACCESIBILIDAD: Handles system font scale adaptation without duplicating theme options
+        // - ACCESIBILIDAD: Handles navigation to dedicated AccessibilityScreen without inlining controls
         // - DATOS_Y_PRIVACIDAD: Handles local data transparency (journal, progress, account)
         // - ACERCA_DE_MIMOMENTO: Handles app identity, version, and external privacy policy
         val visualThemeScope = setOf("theme_catalog", "active_theme_selection")
-        val accessibilityScope = setOf("system_font_scale_info")
+        val accessibilityScope = setOf("accessibility_row_navigation")
 
         val intersection = visualThemeScope.intersect(accessibilityScope)
         assertTrue(
@@ -163,6 +169,56 @@ class SettingsSectionOrganizationTest {
         val overlap = settingsSection4Scope.intersect(aboutDedicatedScreenScope)
         assertTrue(
             "Settings must not inline detailed About content; it must delegate to AboutScreen",
+            overlap.isEmpty(),
+        )
+    }
+
+    @Test
+    fun backStackTransitions_fromHomeToSettingsToAccessibilityAndReturn() {
+        val backStack = mutableListOf(MiMomentoDestinations.HOME)
+        assertTrue(shouldShowBottomBar(backStack.last()))
+
+        // 1. Enter Settings
+        backStack.add(MiMomentoDestinations.SETTINGS)
+        assertEquals(listOf(MiMomentoDestinations.HOME, MiMomentoDestinations.SETTINGS), backStack)
+        assertFalse(shouldShowBottomBar(backStack.last()))
+
+        // 2. Navigate from Settings to Accessibility
+        backStack.add(MiMomentoDestinations.ACCESSIBILITY)
+        assertEquals(
+            listOf(MiMomentoDestinations.HOME, MiMomentoDestinations.SETTINGS, MiMomentoDestinations.ACCESSIBILITY),
+            backStack,
+        )
+        assertFalse(shouldShowBottomBar(backStack.last()))
+
+        // 3. Navigate back from Accessibility to Settings
+        backStack.removeAt(backStack.size - 1)
+        assertEquals(listOf(MiMomentoDestinations.HOME, MiMomentoDestinations.SETTINGS), backStack)
+        assertFalse(shouldShowBottomBar(backStack.last()))
+
+        // 4. Navigate back from Settings to Home
+        backStack.removeAt(backStack.size - 1)
+        assertEquals(listOf(MiMomentoDestinations.HOME), backStack)
+        assertTrue(shouldShowBottomBar(backStack.last()))
+    }
+
+    @Test
+    fun settingsAccessibilitySection_delegatesToDedicatedScreenWithoutInliningControls() {
+        // Settings contains only the entry point row for Accessibility
+        val settingsSection2Scope = setOf("accessibility_row", "chevron_navigation")
+
+        // Detailed accessibility controls belong exclusively to AccessibilityScreen (settings/accessibility)
+        val accessibilityDedicatedScreenScope = setOf(
+            "text_scale_options",
+            "text_scale_preview",
+            "high_contrast_switch",
+            "reduce_motion_switch",
+            "system_accessibility_notice",
+        )
+
+        val overlap = settingsSection2Scope.intersect(accessibilityDedicatedScreenScope)
+        assertTrue(
+            "Settings must not inline detailed Accessibility controls; it must delegate to AccessibilityScreen",
             overlap.isEmpty(),
         )
     }

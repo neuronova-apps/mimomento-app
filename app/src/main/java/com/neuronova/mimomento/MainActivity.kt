@@ -8,6 +8,7 @@ import androidx.datastore.preferences.preferencesDataStore
 import com.neuronova.mimomento.data.local.FileJournalStorage
 import com.neuronova.mimomento.data.local.FileProgressStorage
 import com.neuronova.mimomento.data.local.MiMomentoContentLoader
+import com.neuronova.mimomento.data.repository.AccessibilityPreferencesRepository
 import com.neuronova.mimomento.data.repository.LocalJournalRepository
 import com.neuronova.mimomento.data.repository.LocalProgressRepository
 import com.neuronova.mimomento.data.repository.MiMomentoContentRepository
@@ -16,12 +17,14 @@ import com.neuronova.mimomento.ui.app.MiMomentoApp
 import java.io.File
 
 private val Context.themeDataStore by preferencesDataStore(name = "theme_preferences")
+private val Context.accessibilityDataStore by preferencesDataStore(name = "accessibility_preferences")
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val contentRepository = MiMomentoContentRepository(MiMomentoContentLoader(applicationContext))
         val themeRepository = ThemePreferencesRepository(applicationContext.themeDataStore)
+        val accessibilityRepository = AccessibilityPreferencesRepository(applicationContext.accessibilityDataStore)
         val journalStorage = FileJournalStorage(File(applicationContext.filesDir, "journal_entries.json"))
         val journalRepository = LocalJournalRepository(journalStorage)
         val progressStorage = FileProgressStorage(File(applicationContext.filesDir, "progress_events.json"))
@@ -34,6 +37,7 @@ class MainActivity : ComponentActivity() {
             MiMomentoApp(
                 repository = contentRepository,
                 themeRepository = themeRepository,
+                accessibilityRepository = accessibilityRepository,
                 journalRepository = journalRepository,
                 progressRepository = progressRepository,
             )

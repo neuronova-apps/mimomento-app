@@ -31,7 +31,14 @@ data class ThemeVisualDefinition(
     val overlayAlpha: Float = 0.85f,
     val scrimColor: Color,
     val decorativeAlpha: Float = 0.15f,
-)
+) {
+    fun toHighContrast(): ThemeVisualDefinition = copy(
+        cardColor = cardColor.copy(alpha = 1.0f),
+        borderColor = primary.copy(alpha = 0.65f),
+        overlayAlpha = (overlayAlpha + 0.15f).coerceAtMost(0.92f),
+        decorativeAlpha = 0.30f,
+    )
+}
 
 data class MiMomentoThemeDefinition(
     val id: MiMomentoThemeId,
