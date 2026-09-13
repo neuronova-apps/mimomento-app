@@ -12,10 +12,13 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.selection.selectable
+import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -46,9 +49,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.neuronova.mimomento.R
+import com.neuronova.mimomento.data.model.AppearanceMode
 import com.neuronova.mimomento.data.model.MiMomentoThemeDefinition
 import com.neuronova.mimomento.data.model.MiMomentoThemeId
 import com.neuronova.mimomento.ui.theme.LocalHighContrast
@@ -103,6 +110,35 @@ fun ThemesScreen(
                 .padding(horizontal = 20.dp, vertical = 12.dp)
                 .verticalScroll(rememberScrollState()),
         ) {
+            // Sección: Modo de apariencia (Selector compacto)
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                shape = MaterialTheme.shapes.medium,
+                colors = themedCardColors(),
+                border = themedCardBorder(),
+            ) {
+                ThemedCardAccentLine()
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                ) {
+                    Text(
+                        text = stringResource(R.string.theme_appearance_mode),
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.SemiBold,
+                        color = MaterialTheme.colorScheme.onSurface,
+                    )
+                    Spacer(modifier = Modifier.height(12.dp))
+                    AppearanceModeSelector(
+                        currentMode = uiState.appearanceMode,
+                        onModeSelected = { themeViewModel.setAppearanceMode(it) },
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
             // Sección: Cambio automático
             Card(
                 modifier = Modifier.fillMaxWidth(),
@@ -453,6 +489,87 @@ private fun ThemeBadge(
                 color = textColor,
                 fontWeight = FontWeight.SemiBold,
             )
+        }
+    }
+}
+
+@Composable
+fun AppearanceModeSelector(
+    currentMode: AppearanceMode,
+    onModeSelected: (AppearanceMode) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val isHC = LocalHighContrast.current
+    val options = listOf(
+        AppearanceMode.DAY to stringResource(R.string.theme_appearance_day),
+        AppearanceMode.NIGHT to stringResource(R.string.theme_appearance_night),
+        AppearanceMode.SYSTEM to stringResource(R.string.theme_appearance_system),
+    )
+
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .selectableGroup(),
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
+        options.forEach { (mode, label) ->
+            val isSelected = currentMode == mode
+
+            val backgroundColor = if (isHC) {
+                if (isSelected) Color(0xFFFFD600) else Color(0xFF101010)
+            } else {
+                if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.35f)
+            }
+
+            val textColor = if (isHC) {
+                if (isSelected) Color.Black else Color.White
+            } else {
+                if (isSelected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface
+            }
+
+            val borderColor = if (isHC) {
+                if (isSelected) Color(0xFFFFD600) else Color.White
+            } else {
+                if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.6f)
+            }
+
+            val borderWidth = if (isHC) 2.dp else if (isSelected) 1.5.dp else 1.dp
+
+            Surface(
+                modifier = Modifier
+                    .weight(1f)
+                    .heightIn(min = 48.dp)
+                    .clip(RoundedCornerShape(10.dp))
+                    .border(
+                        width = borderWidth,
+                        color = borderColor,
+                        shape = RoundedCornerShape(10.dp),
+                    )
+                    .selectable(
+                        selected = isSelected,
+                        onClick = { onModeSelected(mode) },
+                        role = Role.RadioButton,
+                    ),
+                color = backgroundColor,
+                shape = RoundedCornerShape(10.dp),
+            ) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(horizontal = 4.dp, vertical = 10.dp),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Text(
+                        text = label,
+                        style = MaterialTheme.typography.labelLarge,
+                        fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
+                        color = textColor,
+                        textAlign = TextAlign.Center,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                    )
+                }
+            }
         }
     }
 }

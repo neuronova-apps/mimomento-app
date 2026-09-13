@@ -1,6 +1,7 @@
 package com.neuronova.mimomento.ui.theme
 
 import androidx.datastore.preferences.core.PreferenceDataStoreFactory
+import com.neuronova.mimomento.data.model.AppearanceMode
 import com.neuronova.mimomento.data.model.MiMomentoThemeCatalog
 import com.neuronova.mimomento.data.model.MiMomentoThemeId
 import com.neuronova.mimomento.data.repository.DebugThemePreviewPolicy
@@ -250,5 +251,56 @@ class ThemeViewModelTest {
         assertFalse(state.isThemeOwned(MiMomentoThemeId.SCRIPTURE))
         assertFalse(state.isThemeOwned(MiMomentoThemeId.SERENE))
         assertTrue(state.isThemeOwned(MiMomentoThemeId.SKY))
+    }
+
+    // --- PRUEBAS DE MODO DE APARIENCIA ---
+
+    @Test
+    fun initialState_hasSystemAppearanceMode() = runBlocking {
+        val (viewModel, _) = createViewModel()
+        val state = viewModel.uiState.first()
+        assertEquals(AppearanceMode.SYSTEM, state.appearanceMode)
+    }
+
+    @Test
+    fun setAppearanceMode_updatesUiStateImmediately() = runBlocking {
+        val (viewModel, _) = createViewModel()
+        viewModel.setAppearanceMode(AppearanceMode.NIGHT)
+        val stateNight = viewModel.uiState.first { it.appearanceMode == AppearanceMode.NIGHT }
+        assertEquals(AppearanceMode.NIGHT, stateNight.appearanceMode)
+
+        viewModel.setAppearanceMode(AppearanceMode.DAY)
+        val stateDay = viewModel.uiState.first { it.appearanceMode == AppearanceMode.DAY }
+        assertEquals(AppearanceMode.DAY, stateDay.appearanceMode)
+    }
+
+    @Test
+    fun setAppearanceMode_doesNotAlterSelectedOrActiveTheme() = runBlocking {
+        val (viewModel, _) = createViewModel()
+        val initial = viewModel.uiState.first()
+        assertEquals(MiMomentoThemeCatalog.SKY, initial.selectedTheme)
+        assertEquals(MiMomentoThemeCatalog.SKY, initial.activeTheme)
+
+        viewModel.setAppearanceMode(AppearanceMode.NIGHT)
+        val updated = viewModel.uiState.first { it.appearanceMode == AppearanceMode.NIGHT }
+        assertEquals(MiMomentoThemeCatalog.SKY, updated.selectedTheme)
+        assertEquals(MiMomentoThemeCatalog.SKY, updated.activeTheme)
+    }
+
+    @Test
+    fun selectTheme_doesNotAlterAppearanceMode() = runBlocking {
+        val allOwnedPolicy = object : ThemeAvailabilityPolicy {
+            override fun isThemeOwned(themeId: MiMomentoThemeId): Boolean = true
+            override fun getOwnedThemes(): Set<MiMomentoThemeId> = MiMomentoThemeId.values().toSet()
+        }
+        val (viewModel, _) = createViewModel(policy = allOwnedPolicy)
+        viewModel.setAppearanceMode(AppearanceMode.NIGHT)
+        val stateNight = viewModel.uiState.first { it.appearanceMode == AppearanceMode.NIGHT }
+        assertEquals(AppearanceMode.NIGHT, stateNight.appearanceMode)
+
+        viewModel.selectTheme(MiMomentoThemeId.DAWN)
+        val stateDawn = viewModel.uiState.first { it.selectedTheme.id == MiMomentoThemeId.DAWN }
+        assertEquals("AppearanceMode must remain NIGHT after selecting DAWN", AppearanceMode.NIGHT, stateDawn.appearanceMode)
+        assertEquals(MiMomentoThemeCatalog.DAWN, stateDawn.selectedTheme)
     }
 }

@@ -129,6 +129,8 @@ fun MiMomentoApp(
         mutableStateOf(AccessibilityUiState())
     }
     val activeTheme = themeUiState.activeTheme
+    val systemInDark = androidx.compose.foundation.isSystemInDarkTheme()
+    val isDarkTheme = com.neuronova.mimomento.data.model.resolveIsDarkTheme(themeUiState.appearanceMode, systemInDark)
 
     val currentDensity = LocalDensity.current
     val effectiveDensity = remember(currentDensity, accessibilityUiState.textScale) {
@@ -141,9 +143,11 @@ fun MiMomentoApp(
     CompositionLocalProvider(LocalDensity provides effectiveDensity) {
         MiMomentoTheme(
             theme = activeTheme,
+            isDarkTheme = isDarkTheme,
             highContrast = accessibilityUiState.highContrast,
         ) {
-            ThemedBackground(theme = activeTheme) {
+            val currentEffectiveTheme = com.neuronova.mimomento.ui.theme.LocalActiveTheme.current
+            ThemedBackground(theme = currentEffectiveTheme) {
             when (val state = contentState) {
                 AppContentUiState.Loading -> {
                     LoadingView()
@@ -167,10 +171,10 @@ fun MiMomentoApp(
                             if (showBottomBar) {
                                 val isHC = accessibilityUiState.highContrast
                                 NavigationBar(
-                                    containerColor = if (isHC) Color.Black else activeTheme.visual.cardColor.copy(alpha = 0.94f),
+                                    containerColor = if (isHC) Color.Black else currentEffectiveTheme.visual.cardColor.copy(alpha = 0.94f),
                                     modifier = Modifier.drawBehind {
                                         drawLine(
-                                            color = if (isHC) Color.White else activeTheme.visual.borderColor.copy(alpha = 0.5f),
+                                            color = if (isHC) Color.White else currentEffectiveTheme.visual.borderColor.copy(alpha = 0.5f),
                                             start = Offset(0f, 0f),
                                             end = Offset(size.width, 0f),
                                             strokeWidth = if (isHC) 2.dp.toPx() else 1.dp.toPx(),
@@ -208,11 +212,11 @@ fun MiMomentoApp(
                                                 )
                                             },
                                             colors = NavigationBarItemDefaults.colors(
-                                                selectedIconColor = if (isHC) Color(0xFFFFD600) else activeTheme.visual.primary,
-                                                selectedTextColor = if (isHC) Color(0xFFFFD600) else activeTheme.visual.primary,
-                                                indicatorColor = if (isHC) Color(0xFF101010) else activeTheme.visual.surfaceVariant.copy(alpha = 0.85f),
-                                                unselectedIconColor = if (isHC) Color.White else activeTheme.visual.onSurface.copy(alpha = 0.65f),
-                                                unselectedTextColor = if (isHC) Color.White else activeTheme.visual.onSurface.copy(alpha = 0.65f),
+                                                selectedIconColor = if (isHC) Color(0xFFFFD600) else currentEffectiveTheme.visual.primary,
+                                                selectedTextColor = if (isHC) Color(0xFFFFD600) else currentEffectiveTheme.visual.primary,
+                                                indicatorColor = if (isHC) Color(0xFF101010) else currentEffectiveTheme.visual.surfaceVariant.copy(alpha = 0.85f),
+                                                unselectedIconColor = if (isHC) Color.White else currentEffectiveTheme.visual.onSurface.copy(alpha = 0.65f),
+                                                unselectedTextColor = if (isHC) Color.White else currentEffectiveTheme.visual.onSurface.copy(alpha = 0.65f),
                                             ),
                                         )
                                     }

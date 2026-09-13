@@ -51,17 +51,20 @@ val LocalActiveTheme = staticCompositionLocalOf<MiMomentoThemeDefinition> {
 
 val LocalHighContrast = compositionLocalOf { false }
 
+val LocalDarkTheme = compositionLocalOf { false }
+
 @Composable
 fun MiMomentoTheme(
     theme: MiMomentoThemeDefinition = MiMomentoThemeCatalog.DEFAULT_THEME,
+    isDarkTheme: Boolean = false,
     highContrast: Boolean = false,
     content: @Composable () -> Unit,
 ) {
-    val effectiveVisual = remember(theme, highContrast) {
-        if (highContrast) theme.visual.toHighContrast() else theme.visual
+    val effectiveVisual = remember(theme, isDarkTheme, highContrast) {
+        theme.resolveVisual(isDarkTheme = isDarkTheme, highContrast = highContrast)
     }
-    val effectiveTheme = remember(theme, effectiveVisual, highContrast) {
-        if (highContrast) theme.copy(visual = effectiveVisual) else theme
+    val effectiveTheme = remember(theme, effectiveVisual) {
+        theme.copy(visual = effectiveVisual)
     }
 
     val colorScheme = if (highContrast) {
@@ -90,6 +93,33 @@ fun MiMomentoTheme(
             surfaceContainerHighest = Color(0xFF101010),
             outline = Color.White,
             outlineVariant = Color.White,
+        )
+    } else if (isDarkTheme) {
+        darkColorScheme(
+            primary = effectiveVisual.primary,
+            onPrimary = effectiveVisual.onButtonColor,
+            primaryContainer = effectiveVisual.surfaceVariant,
+            onPrimaryContainer = effectiveVisual.primary,
+            secondary = effectiveVisual.secondary,
+            onSecondary = Color.White,
+            secondaryContainer = effectiveVisual.surfaceVariant,
+            onSecondaryContainer = effectiveVisual.secondary,
+            tertiary = effectiveVisual.secondary,
+            onTertiary = Color.White,
+            tertiaryContainer = effectiveVisual.surfaceVariant.copy(alpha = 0.7f),
+            onTertiaryContainer = effectiveVisual.primary,
+            background = Color.Transparent,
+            onBackground = effectiveVisual.onBackground,
+            surface = effectiveVisual.surface,
+            onSurface = effectiveVisual.onSurface,
+            surfaceVariant = effectiveVisual.surfaceVariant,
+            onSurfaceVariant = effectiveVisual.onSurface.copy(alpha = 0.72f),
+            surfaceContainer = effectiveVisual.cardColor,
+            surfaceContainerLow = effectiveVisual.cardColor,
+            surfaceContainerHigh = effectiveVisual.surfaceVariant,
+            surfaceContainerHighest = effectiveVisual.surfaceVariant,
+            outline = effectiveVisual.borderColor,
+            outlineVariant = effectiveVisual.borderColor.copy(alpha = 0.4f),
         )
     } else {
         lightColorScheme(
@@ -135,6 +165,14 @@ fun MiMomentoTheme(
                     window.navigationBarColor = Color.Black.toArgb()
                     insetsController.isAppearanceLightNavigationBars = false
                 }
+            } else if (isDarkTheme) {
+                window.statusBarColor = effectiveVisual.surface.toArgb()
+                insetsController.isAppearanceLightStatusBars = false
+
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
+                    window.navigationBarColor = effectiveVisual.cardColor.toArgb()
+                    insetsController.isAppearanceLightNavigationBars = false
+                }
             } else {
                 window.statusBarColor = effectiveVisual.surface.toArgb()
                 insetsController.isAppearanceLightStatusBars = true
@@ -150,6 +188,7 @@ fun MiMomentoTheme(
     CompositionLocalProvider(
         LocalActiveTheme provides effectiveTheme,
         LocalHighContrast provides highContrast,
+        LocalDarkTheme provides isDarkTheme,
     ) {
         MaterialTheme(
             colorScheme = colorScheme,

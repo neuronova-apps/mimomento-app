@@ -3,6 +3,7 @@ package com.neuronova.mimomento.ui.theme
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.neuronova.mimomento.data.model.AppearanceMode
 import com.neuronova.mimomento.data.model.MiMomentoThemeCatalog
 import com.neuronova.mimomento.data.model.MiMomentoThemeDefinition
 import com.neuronova.mimomento.data.model.MiMomentoThemeId
@@ -24,6 +25,7 @@ import kotlinx.coroutines.CoroutineScope
 data class ThemeUiState(
     val activeTheme: MiMomentoThemeDefinition = MiMomentoThemeCatalog.DEFAULT_THEME,
     val selectedTheme: MiMomentoThemeDefinition = MiMomentoThemeCatalog.DEFAULT_THEME,
+    val appearanceMode: AppearanceMode = AppearanceMode.SYSTEM,
     val autoThemeEnabled: Boolean = false,
     val autoThemeSelectedIds: Set<MiMomentoThemeId> = setOf(MiMomentoThemeId.SKY),
     val themes: List<MiMomentoThemeDefinition> = MiMomentoThemeCatalog.themes,
@@ -77,6 +79,7 @@ class ThemeViewModel(
         ThemeUiState(
             activeTheme = activeDef,
             selectedTheme = selectedDef,
+            appearanceMode = prefs.appearanceMode,
             autoThemeEnabled = prefs.autoThemeEnabled,
             autoThemeSelectedIds = prefs.autoThemeSelectedIds,
             themes = MiMomentoThemeCatalog.themes,
@@ -98,6 +101,12 @@ class ThemeViewModel(
         sessionThemeIdFlow.value = themeId
         scope.launch {
             repository.setSelectedTheme(themeId)
+        }
+    }
+
+    fun setAppearanceMode(mode: AppearanceMode) {
+        scope.launch {
+            repository.setAppearanceMode(mode)
         }
     }
 

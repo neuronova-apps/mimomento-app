@@ -11,6 +11,38 @@ enum class MiMomentoThemeId {
     SERENE,
 }
 
+enum class AppearanceMode {
+    DAY,
+    NIGHT,
+    SYSTEM;
+
+    fun isDark(systemIsDark: Boolean? = null): Boolean {
+        return when (this) {
+            DAY -> false
+            NIGHT -> true
+            SYSTEM -> systemIsDark ?: false
+        }
+    }
+
+    companion object {
+        val DEFAULT = SYSTEM
+
+        fun fromNameSafe(name: String?): AppearanceMode {
+            if (name.isNullOrBlank()) return DEFAULT
+            return try {
+                valueOf(name.trim().uppercase())
+            } catch (_: IllegalArgumentException) {
+                DEFAULT
+            }
+        }
+    }
+}
+
+fun resolveIsDarkTheme(
+    mode: AppearanceMode,
+    systemIsDark: Boolean? = null,
+): Boolean = mode.isDark(systemIsDark)
+
 enum class ThemeTier {
     FREE,
     PREMIUM,
@@ -48,6 +80,17 @@ data class ThemeVisualDefinition(
         scrimColor = Color(0xFF000000),
         decorativeAlpha = 0.0f,
     )
+
+    fun toNight(): ThemeVisualDefinition = copy(
+        surface = Color(0xFF14181D),
+        surfaceVariant = Color(0xFF202730),
+        onSurface = Color(0xFFE5ECF2),
+        onBackground = Color(0xFFEEF3F7),
+        cardColor = Color(0xEE19212A),
+        borderColor = primary.copy(alpha = 0.28f),
+        overlayAlpha = 0.90f,
+        scrimColor = Color(0xFF0B1015),
+    )
 }
 
 data class MiMomentoThemeDefinition(
@@ -59,11 +102,18 @@ data class MiMomentoThemeDefinition(
     val isPremium: Boolean,
     val tier: ThemeTier = if (isPremium) ThemeTier.PREMIUM else ThemeTier.FREE,
     val visual: ThemeVisualDefinition,
+    val nightVisual: ThemeVisualDefinition = visual.toNight(),
     val headerDecorationRes: Int? = null,
     val cardDecorationRes: Int? = null,
     val sectionDecorationRes: Int? = null,
     val accentStyle: String? = null,
-)
+) {
+    fun resolveVisual(isDarkTheme: Boolean, highContrast: Boolean): ThemeVisualDefinition = when {
+        highContrast -> visual.toHighContrast()
+        isDarkTheme -> nightVisual
+        else -> visual
+    }
+}
 
 object ThemeVisuals {
     val SKY = ThemeVisualDefinition(
@@ -150,6 +200,91 @@ object ThemeVisuals {
         scrimColor = Color(0xFFF3F1F7),
         decorativeAlpha = 0.15f,
     )
+
+    val SKY_NIGHT = ThemeVisualDefinition(
+        primary = Color(0xFF68B2DF),
+        secondary = Color(0xFF8FB9D4),
+        surface = Color(0xFF10171E),
+        surfaceVariant = Color(0xFF1B252F),
+        onSurface = Color(0xFFE4EDF3),
+        onBackground = Color(0xFFEDF4F8),
+        cardColor = Color(0xEE162029),
+        borderColor = Color(0x3868B2DF),
+        iconTint = Color(0xFF68B2DF),
+        buttonColor = Color(0xFF2B719B),
+        onButtonColor = Color(0xFFFFFFFF),
+        overlayAlpha = 0.90f,
+        scrimColor = Color(0xFF0C1318),
+        decorativeAlpha = 0.15f,
+    )
+
+    val DAWN_NIGHT = ThemeVisualDefinition(
+        primary = Color(0xFFE28256),
+        secondary = Color(0xFFDCA96C),
+        surface = Color(0xFF1A1310),
+        surfaceVariant = Color(0xFF281E19),
+        onSurface = Color(0xFFF6ECE5),
+        onBackground = Color(0xFFFAF2EC),
+        cardColor = Color(0xEE221814),
+        borderColor = Color(0x38E28256),
+        iconTint = Color(0xFFE28256),
+        buttonColor = Color(0xFFA65228),
+        onButtonColor = Color(0xFFFFFFFF),
+        overlayAlpha = 0.90f,
+        scrimColor = Color(0xFF130D0A),
+        decorativeAlpha = 0.15f,
+    )
+
+    val NATURE_NIGHT = ThemeVisualDefinition(
+        primary = Color(0xFF65AE84),
+        secondary = Color(0xFF8BBDA0),
+        surface = Color(0xFF101813),
+        surfaceVariant = Color(0xFF1B271F),
+        onSurface = Color(0xFFE2EFE7),
+        onBackground = Color(0xFFEFF7F2),
+        cardColor = Color(0xEE152119),
+        borderColor = Color(0x3865AE84),
+        iconTint = Color(0xFF65AE84),
+        buttonColor = Color(0xFF2F734E),
+        onButtonColor = Color(0xFFFFFFFF),
+        overlayAlpha = 0.90f,
+        scrimColor = Color(0xFF0C130E),
+        decorativeAlpha = 0.15f,
+    )
+
+    val SCRIPTURE_NIGHT = ThemeVisualDefinition(
+        primary = Color(0xFFC08E74),
+        secondary = Color(0xFFCFAC98),
+        surface = Color(0xFF191411),
+        surfaceVariant = Color(0xFF27201C),
+        onSurface = Color(0xFFF3ECE5),
+        onBackground = Color(0xFFFAF5EE),
+        cardColor = Color(0xEE211A16),
+        borderColor = Color(0x38C08E74),
+        iconTint = Color(0xFFC08E74),
+        buttonColor = Color(0xFF7F513A),
+        onButtonColor = Color(0xFFFFFFFF),
+        overlayAlpha = 0.90f,
+        scrimColor = Color(0xFF120D0A),
+        decorativeAlpha = 0.15f,
+    )
+
+    val SERENE_NIGHT = ThemeVisualDefinition(
+        primary = Color(0xFFA29BCB),
+        secondary = Color(0xFFB8B2DC),
+        surface = Color(0xFF14121C),
+        surfaceVariant = Color(0xFF211E2D),
+        onSurface = Color(0xFFECEAF4),
+        onBackground = Color(0xFFF4F3F9),
+        cardColor = Color(0xEE1A1724),
+        borderColor = Color(0x38A29BCB),
+        iconTint = Color(0xFFA29BCB),
+        buttonColor = Color(0xFF5B5388),
+        onButtonColor = Color(0xFFFFFFFF),
+        overlayAlpha = 0.90f,
+        scrimColor = Color(0xFF0E0C14),
+        decorativeAlpha = 0.15f,
+    )
 }
 
 object MiMomentoThemeCatalog {
@@ -160,6 +295,7 @@ object MiMomentoThemeCatalog {
         backgroundRes = R.drawable.theme_sky_bg,
         isPremium = false,
         visual = ThemeVisuals.SKY,
+        nightVisual = ThemeVisuals.SKY_NIGHT,
         accentStyle = "SKY_CELESTIAL_ACCENT",
     )
 
@@ -170,6 +306,7 @@ object MiMomentoThemeCatalog {
         backgroundRes = R.drawable.theme_dawn_bg,
         isPremium = true,
         visual = ThemeVisuals.DAWN,
+        nightVisual = ThemeVisuals.DAWN_NIGHT,
         accentStyle = "DAWN_SUNRISE_ACCENT",
     )
 
@@ -180,6 +317,7 @@ object MiMomentoThemeCatalog {
         backgroundRes = R.drawable.theme_nature_bg,
         isPremium = true,
         visual = ThemeVisuals.NATURE,
+        nightVisual = ThemeVisuals.NATURE_NIGHT,
         accentStyle = "NATURE_LEAF_ACCENT",
     )
 
@@ -190,6 +328,7 @@ object MiMomentoThemeCatalog {
         backgroundRes = R.drawable.theme_scripture_bg,
         isPremium = true,
         visual = ThemeVisuals.SCRIPTURE,
+        nightVisual = ThemeVisuals.SCRIPTURE_NIGHT,
         accentStyle = "SCRIPTURE_PARCHMENT_ACCENT",
     )
 
@@ -200,6 +339,7 @@ object MiMomentoThemeCatalog {
         backgroundRes = R.drawable.theme_serene_bg,
         isPremium = true,
         visual = ThemeVisuals.SERENE,
+        nightVisual = ThemeVisuals.SERENE_NIGHT,
         accentStyle = "SERENE_TWILIGHT_ACCENT",
     )
 

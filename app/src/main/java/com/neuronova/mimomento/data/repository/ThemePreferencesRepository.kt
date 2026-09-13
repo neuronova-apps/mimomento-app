@@ -1,4 +1,4 @@
-﻿package com.neuronova.mimomento.data.repository
+package com.neuronova.mimomento.data.repository
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
@@ -6,6 +6,7 @@ import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.core.stringSetPreferencesKey
+import com.neuronova.mimomento.data.model.AppearanceMode
 import com.neuronova.mimomento.data.model.MiMomentoThemeCatalog
 import com.neuronova.mimomento.data.model.MiMomentoThemeDefinition
 import com.neuronova.mimomento.data.model.MiMomentoThemeId
@@ -15,6 +16,7 @@ import kotlin.random.Random
 
 data class ThemePreferencesState(
     val selectedThemeId: MiMomentoThemeId = MiMomentoThemeId.SKY,
+    val appearanceMode: AppearanceMode = AppearanceMode.SYSTEM,
     val autoThemeEnabled: Boolean = false,
     val autoThemeSelectedIds: Set<MiMomentoThemeId> = setOf(MiMomentoThemeId.SKY),
     val autoThemeMode: String = AUTO_MODE_SESSION_START,
@@ -30,6 +32,7 @@ class ThemePreferencesRepository(
 ) {
     companion object {
         val KEY_SELECTED_THEME_ID = stringPreferencesKey("selected_theme_id")
+        val KEY_APPEARANCE_MODE = stringPreferencesKey("appearance_mode")
         val KEY_AUTO_THEME_ENABLED = booleanPreferencesKey("auto_theme_enabled")
         val KEY_AUTO_THEME_SELECTED_IDS = stringSetPreferencesKey("auto_theme_selected_ids")
         val KEY_AUTO_THEME_MODE = stringPreferencesKey("auto_theme_mode")
@@ -38,6 +41,9 @@ class ThemePreferencesRepository(
     val preferencesFlow: Flow<ThemePreferencesState> = dataStore.data.map { prefs ->
         val rawSelectedId = prefs[KEY_SELECTED_THEME_ID]
         val selectedThemeId = parseThemeIdSafe(rawSelectedId)
+
+        val rawAppearanceMode = prefs[KEY_APPEARANCE_MODE]
+        val appearanceMode = AppearanceMode.fromNameSafe(rawAppearanceMode)
 
         val autoEnabled = prefs[KEY_AUTO_THEME_ENABLED] ?: false
 
@@ -59,6 +65,7 @@ class ThemePreferencesRepository(
 
         ThemePreferencesState(
             selectedThemeId = selectedThemeId,
+            appearanceMode = appearanceMode,
             autoThemeEnabled = autoEnabled,
             autoThemeSelectedIds = autoSelectedIds,
             autoThemeMode = mode,
@@ -68,6 +75,12 @@ class ThemePreferencesRepository(
     suspend fun setSelectedTheme(themeId: MiMomentoThemeId) {
         dataStore.edit { prefs ->
             prefs[KEY_SELECTED_THEME_ID] = themeId.name
+        }
+    }
+
+    suspend fun setAppearanceMode(mode: AppearanceMode) {
+        dataStore.edit { prefs ->
+            prefs[KEY_APPEARANCE_MODE] = mode.name
         }
     }
 

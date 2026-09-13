@@ -1,8 +1,9 @@
-﻿package com.neuronova.mimomento.data.repository
+package com.neuronova.mimomento.data.repository
 
 import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
+import com.neuronova.mimomento.data.model.AppearanceMode
 import com.neuronova.mimomento.data.model.MiMomentoThemeId
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
@@ -209,5 +210,63 @@ class ThemeRepositoryTest {
 
         // Multiple calls during the same session with same initial decision return identical theme
         assertEquals(sessionTheme, repository.resolveSessionTheme(state, policy = policyMulti, randomSource = Random(fixedSessionSeed)))
+    }
+
+    // --- MODO DE APARIENCIA ---
+
+    @Test
+    fun preferences_defaultAppearanceModeIsSystem() = runBlocking {
+        val repository = createRepository()
+        val state = repository.preferencesFlow.first()
+        assertEquals(AppearanceMode.SYSTEM, state.appearanceMode)
+    }
+
+    @Test
+    fun preferences_setAppearanceModeDayPersists() = runBlocking {
+        val repository = createRepository()
+        repository.setAppearanceMode(AppearanceMode.DAY)
+        val state = repository.preferencesFlow.first()
+        assertEquals(AppearanceMode.DAY, state.appearanceMode)
+    }
+
+    @Test
+    fun preferences_setAppearanceModeNightPersists() = runBlocking {
+        val repository = createRepository()
+        repository.setAppearanceMode(AppearanceMode.NIGHT)
+        val state = repository.preferencesFlow.first()
+        assertEquals(AppearanceMode.NIGHT, state.appearanceMode)
+    }
+
+    @Test
+    fun preferences_setAppearanceModeSystemPersists() = runBlocking {
+        val repository = createRepository()
+        repository.setAppearanceMode(AppearanceMode.DAY)
+        repository.setAppearanceMode(AppearanceMode.SYSTEM)
+        val state = repository.preferencesFlow.first()
+        assertEquals(AppearanceMode.SYSTEM, state.appearanceMode)
+    }
+
+    @Test
+    fun preferences_corruptAppearanceModeFallsBackToSystem() = runBlocking {
+        val testFile = tempFolder.newFile("corrupt_app_mode_${System.nanoTime()}.preferences_pb")
+        val dataStore = PreferenceDataStoreFactory.create { testFile }
+        dataStore.edit { prefs ->
+            prefs[ThemePreferencesRepository.KEY_APPEARANCE_MODE] = "INVALID_CORRUPTED_APPEARANCE"
+        }
+        val repository = ThemePreferencesRepository(dataStore)
+        val state = repository.preferencesFlow.first()
+        assertEquals(AppearanceMode.SYSTEM, state.appearanceMode)
+    }
+
+    @Test
+    fun preferences_existingUserSavedPreferenceRespected() = runBlocking {
+        val testFile = tempFolder.newFile("existing_user_mode_${System.nanoTime()}.preferences_pb")
+        val dataStore = PreferenceDataStoreFactory.create { testFile }
+        dataStore.edit { prefs ->
+            prefs[ThemePreferencesRepository.KEY_APPEARANCE_MODE] = "NIGHT"
+        }
+        val repository = ThemePreferencesRepository(dataStore)
+        val state = repository.preferencesFlow.first()
+        assertEquals("Existing saved NIGHT preference must be respected and not overwritten", AppearanceMode.NIGHT, state.appearanceMode)
     }
 }

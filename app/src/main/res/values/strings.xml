@@ -71,6 +71,10 @@
     <string name="theme_preview_active">Vista previa: %1$s</string>
     <string name="theme_preview_exit">Salir de vista previa</string>
     <string name="theme_preview_debug_only">Disponible solo para pruebas de desarrollo</string>
+    <string name="theme_appearance_mode">Modo de apariencia</string>
+    <string name="theme_appearance_day">Día</string>
+    <string name="theme_appearance_night">Noche</string>
+    <string name="theme_appearance_system">Sistema</string>
     <string name="settings_theme_light">Claro</string>
     <string name="settings_theme_dark">Oscuro</string>
     <string name="settings_theme_system">Sistema</string>
