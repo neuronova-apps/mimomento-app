@@ -22,6 +22,7 @@ import com.neuronova.mimomento.ui.prayers.PrayersViewModel
 import com.neuronova.mimomento.ui.prayers.SpiritualMomentDetailScreen
 import com.neuronova.mimomento.ui.progress.ProgressScreen
 import com.neuronova.mimomento.ui.settings.SettingsScreen
+import com.neuronova.mimomento.ui.journal.JournalViewModel
 import com.neuronova.mimomento.ui.settings.ThemesScreen
 import com.neuronova.mimomento.ui.theme.ThemeViewModel
 import com.neuronova.mimomento.ui.welcome.WelcomeScreen
@@ -36,6 +37,7 @@ fun MiMomentoNavHost(
     modifier: Modifier = Modifier,
     startDestination: String = MiMomentoDestinations.START_DESTINATION,
     themeViewModel: ThemeViewModel? = null,
+    journalViewModel: JournalViewModel? = null,
 ) {
     NavHost(
         navController = navController,
@@ -142,7 +144,9 @@ fun MiMomentoNavHost(
         }
 
         composable(route = MiMomentoDestinations.JOURNAL) {
-            JournalScreen()
+            if (journalViewModel != null) {
+                JournalScreen(viewModel = journalViewModel)
+            }
         }
 
         composable(route = MiMomentoDestinations.PROGRESS) {

@@ -19,6 +19,7 @@ import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -28,8 +29,11 @@ import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.neuronova.mimomento.data.local.FileJournalStorage
 import com.neuronova.mimomento.data.model.MiMomentoThemeCatalog
 import com.neuronova.mimomento.data.repository.DefaultThemeAvailabilityPolicy
+import com.neuronova.mimomento.data.repository.JournalRepository
+import com.neuronova.mimomento.data.repository.LocalJournalRepository
 import com.neuronova.mimomento.data.repository.MiMomentoContentRepository
 import com.neuronova.mimomento.data.repository.ThemeAvailabilityPolicy
 import com.neuronova.mimomento.data.repository.ThemePreferencesRepository
@@ -37,6 +41,7 @@ import com.neuronova.mimomento.data.validation.MiMomentoContentValidator
 import com.neuronova.mimomento.ui.components.ErrorView
 import com.neuronova.mimomento.ui.components.LoadingView
 import com.neuronova.mimomento.ui.devotionals.DevotionalsViewModel
+import com.neuronova.mimomento.ui.journal.JournalViewModel
 import com.neuronova.mimomento.ui.navigation.MiMomentoDestinations
 import com.neuronova.mimomento.ui.navigation.MiMomentoNavHost
 import com.neuronova.mimomento.ui.navigation.TOP_LEVEL_DESTINATIONS
@@ -46,11 +51,13 @@ import com.neuronova.mimomento.ui.theme.MiMomentoTheme
 import com.neuronova.mimomento.ui.theme.ThemedBackground
 import com.neuronova.mimomento.ui.theme.ThemeUiState
 import com.neuronova.mimomento.ui.theme.ThemeViewModel
+import java.io.File
 
 @Composable
 fun MiMomentoApp(
     repository: MiMomentoContentRepository,
     themeRepository: ThemePreferencesRepository? = null,
+    journalRepository: JournalRepository? = null,
     availabilityPolicy: ThemeAvailabilityPolicy = DefaultThemeAvailabilityPolicy(),
     previewPolicy: com.neuronova.mimomento.data.repository.DebugThemePreviewPolicy = com.neuronova.mimomento.data.repository.DefaultDebugThemePreviewPolicy(),
     validator: MiMomentoContentValidator = MiMomentoContentValidator(),
@@ -63,11 +70,20 @@ fun MiMomentoApp(
     prayersViewModel: PrayersViewModel = viewModel(
         factory = PrayersViewModel.provideFactory(repository),
     ),
+    journalViewModel: JournalViewModel? = null,
     themeViewModel: ThemeViewModel? = themeRepository?.let {
         viewModel(factory = ThemeViewModel.provideFactory(it, availabilityPolicy, previewPolicy))
     },
     navController: NavHostController = rememberNavController(),
 ) {
+    val context = LocalContext.current
+    val effectiveJournalViewModel: JournalViewModel = journalViewModel ?: viewModel(
+        factory = JournalViewModel.provideFactory(
+            journalRepository ?: remember {
+                LocalJournalRepository(FileJournalStorage(File(context.filesDir, "journal_entries.json")))
+            }
+        )
+    )
     val contentState by appContentViewModel.uiState.collectAsState()
     val themeUiState by themeViewModel?.uiState?.collectAsState() ?: remember {
         mutableStateOf(ThemeUiState())
@@ -155,6 +171,7 @@ fun MiMomentoApp(
                             navController = navController,
                             devotionalsViewModel = devotionalsViewModel,
                             prayersViewModel = prayersViewModel,
+                            journalViewModel = effectiveJournalViewModel,
                             themeViewModel = themeViewModel,
                             devotionalCount = state.devotionalCount,
                             onNavigateToDevotionals = {

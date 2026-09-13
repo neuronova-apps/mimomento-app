@@ -182,6 +182,34 @@
     <string name="prayer_deepen_description">Puedes continuar con un devocional relacionado con este tema.</string>
     <string name="prayer_read_devotional">Leer devocional</string>
 
+    <!-- Journal Screen -->
+    <string name="journal_title">Diario</string>
+    <string name="journal_new_entry">Nueva entrada</string>
+    <string name="journal_edit_entry">Editar entrada</string>
+    <string name="journal_empty_title">Tu diario personal</string>
+    <string name="journal_empty_message">Escribe tus reflexiones, oraciones y momentos de gratitud. Todas tus entradas se guardan de forma segura en tu dispositivo.</string>
+    <string name="journal_empty_action">Escribir primera entrada</string>
+    <string name="journal_input_placeholder">¿Qué hay en tu corazón hoy? Escribe libremente…</string>
+    <string name="journal_mood_label">¿Cómo te sientes? (opcional)</string>
+    <string name="journal_action_save">Guardar</string>
+    <string name="journal_action_cancel">Cancelar</string>
+    <string name="journal_action_delete">Eliminar</string>
+    <string name="journal_delete_title">¿Eliminar esta entrada?</string>
+    <string name="journal_delete_confirm_message">Esta entrada se eliminará de forma permanente de tu dispositivo. Esta acción no se puede deshacer.</string>
+    <string name="journal_error_empty">Escribe algo antes de guardar tu entrada.</string>
+    <string name="journal_entry_saved">Entrada guardada</string>
+    <string name="journal_entry_deleted">Entrada eliminada</string>
+    <string name="journal_card_options">Opciones de entrada</string>
+
+    <!-- Emotional States (Everyday, non-clinical) -->
+    <string name="mood_good">Bien</string>
+    <string name="mood_calm">Tranquilo</string>
+    <string name="mood_cheerful">Animado</string>
+    <string name="mood_neutral">Neutral</string>
+    <string name="mood_tired">Cansado</string>
+    <string name="mood_worried">Preocupado</string>
+    <string name="mood_sad">Triste</string>
+
     <!-- Placeholders -->
     <string name="placeholder_prayers_title">Oraciones</string>
     <string name="placeholder_prayers_message">Esta sección se habilitará en una siguiente fase.</string>
