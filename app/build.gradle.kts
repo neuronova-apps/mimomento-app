@@ -5,13 +5,13 @@ plugins {
 }
 
 android {
-    namespace = "com.neuronova.mimomento"
+    namespace = "com.neuronovaapps.mimomento"
     compileSdk {
         version = release(37)
     }
 
     defaultConfig {
-        applicationId = "com.neuronova.mimomento"
+        applicationId = "com.neuronovaapps.mimomento"
         minSdk = 24
         targetSdk = 37
         versionCode = 1
