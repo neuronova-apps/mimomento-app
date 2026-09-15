@@ -12,3 +12,10 @@ local.properties
 captures/
 output.json
 hs_err_pid*
+
+# Keystore and signing secrets
+*.jks
+*.keystore
+*.pepk
+keystore.properties
+
