@@ -1,5 +1,6 @@
 package com.neuronova.mimomento.ui.settings
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -26,6 +27,8 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -34,6 +37,8 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
@@ -42,11 +47,14 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
@@ -54,6 +62,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.launch
 import com.neuronova.mimomento.R
 import com.neuronova.mimomento.data.model.AppearanceMode
 import com.neuronova.mimomento.data.model.MiMomentoThemeDefinition
@@ -73,6 +82,9 @@ fun ThemesScreen(
     modifier: Modifier = Modifier,
 ) {
     val uiState by themeViewModel.uiState.collectAsState()
+    val snackbarHostState = remember { SnackbarHostState() }
+    val coroutineScope = rememberCoroutineScope()
+    val premiumRequiredMessage = stringResource(R.string.theme_premium_required)
 
     Scaffold(
         topBar = {
@@ -100,6 +112,7 @@ fun ThemesScreen(
                 ),
             )
         },
+        snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
         containerColor = MaterialTheme.colorScheme.background,
         modifier = modifier.fillMaxSize(),
     ) { innerPadding ->
@@ -193,52 +206,23 @@ fun ThemesScreen(
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            // Indicador de preview debug activo
-            if (uiState.isDebugPreviewActive) {
-                Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = MaterialTheme.shapes.medium,
-                    colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.85f),
-                    ),
-                    border = themedCardBorder(isSelected = true),
-                ) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 16.dp, vertical = 12.dp),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
-                        Column(modifier = Modifier.weight(1f)) {
-                            Text(
-                                text = stringResource(
-                                    R.string.theme_preview_active,
-                                    stringResource(uiState.activeTheme.nameRes),
-                                ),
-                                style = MaterialTheme.typography.titleMedium,
-                                fontWeight = FontWeight.Bold,
-                                color = MaterialTheme.colorScheme.onPrimaryContainer,
-                            )
-                            Text(
-                                text = stringResource(R.string.theme_preview_debug_only),
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.8f),
-                            )
+            // Indicador compacto de vista previa temporal activa
+            val currentPreview = uiState.previewTheme
+            if (currentPreview != null) {
+                ThemePreviewBanner(
+                    previewTheme = currentPreview,
+                    onUseTheme = {
+                        val confirmed = themeViewModel.confirmPreviewTheme()
+                        if (!confirmed) {
+                            coroutineScope.launch {
+                                snackbarHostState.showSnackbar(premiumRequiredMessage)
+                            }
                         }
-                        Spacer(modifier = Modifier.width(8.dp))
-                        OutlinedButton(
-                            onClick = { themeViewModel.exitDebugPreview() },
-                            contentPadding = PaddingValues(horizontal = 12.dp, vertical = 6.dp),
-                        ) {
-                            Text(
-                                text = stringResource(R.string.theme_preview_exit),
-                                style = MaterialTheme.typography.labelMedium,
-                                fontWeight = FontWeight.SemiBold,
-                            )
-                        }
-                    }
-                }
+                    },
+                    onExitPreview = {
+                        themeViewModel.clearThemePreview()
+                    },
+                )
 
                 Spacer(modifier = Modifier.height(16.dp))
             }
@@ -256,17 +240,15 @@ fun ThemesScreen(
 
             // Exactamente los 5 temas
             uiState.themes.forEach { theme ->
-                val isPreviewing = theme.id == uiState.debugPreviewThemeId
+                val isPreviewing = theme.id == uiState.previewTheme?.id
                 ThemeCard(
                     theme = theme,
                     isSelected = theme.id == uiState.selectedTheme.id,
-                    isActive = theme.id == uiState.activeTheme.id,
+                    isActive = theme.id == uiState.effectiveTheme.id,
                     isPreviewing = isPreviewing,
-                    isDebugPreviewAllowed = uiState.isDebugPreviewAllowed,
                     isOwned = uiState.isThemeOwned(theme.id),
                     onSelect = { themeViewModel.selectTheme(theme.id) },
-                    onDebugPreview = { themeViewModel.setDebugPreview(theme.id) },
-                    onExitPreview = { themeViewModel.exitDebugPreview() },
+                    onPreview = { themeViewModel.previewTheme(theme.id) },
                 )
                 Spacer(modifier = Modifier.height(12.dp))
             }
@@ -282,11 +264,9 @@ private fun ThemeCard(
     isSelected: Boolean,
     isActive: Boolean,
     isPreviewing: Boolean,
-    isDebugPreviewAllowed: Boolean,
     isOwned: Boolean,
     onSelect: () -> Unit,
-    onDebugPreview: () -> Unit,
-    onExitPreview: () -> Unit,
+    onPreview: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val isHC = LocalHighContrast.current
@@ -307,7 +287,13 @@ private fun ThemeCard(
                 color = borderColor,
                 shape = MaterialTheme.shapes.medium,
             )
-            .clickable(enabled = isOwned, onClick = onSelect),
+            .clickable {
+                if (isOwned) {
+                    onSelect()
+                } else {
+                    onPreview()
+                }
+            },
         shape = MaterialTheme.shapes.medium,
         colors = themedCardColors(),
     ) {
@@ -335,15 +321,15 @@ private fun ThemeCard(
                     if (theme.id == MiMomentoThemeId.SKY) {
                         ThemeBadge(
                             text = stringResource(R.string.theme_default),
-                            backgroundColor = MaterialTheme.colorScheme.primaryContainer,
-                            textColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                            backgroundColor = if (isHC) Color(0xFF101010) else MaterialTheme.colorScheme.primaryContainer,
+                            textColor = if (isHC) Color.White else MaterialTheme.colorScheme.onPrimaryContainer,
                         )
                     } else if (theme.isPremium) {
                         ThemeBadge(
                             text = stringResource(R.string.theme_premium),
                             icon = Icons.Default.Lock,
-                            backgroundColor = MaterialTheme.colorScheme.secondaryContainer,
-                            textColor = MaterialTheme.colorScheme.onSecondaryContainer,
+                            backgroundColor = if (isHC) Color(0xFF101010) else MaterialTheme.colorScheme.secondaryContainer,
+                            textColor = if (isHC) Color.White else MaterialTheme.colorScheme.onSecondaryContainer,
                         )
                     }
 
@@ -355,8 +341,8 @@ private fun ThemeCard(
                             ThemeBadge(
                                 text = stringResource(R.string.theme_preview),
                                 icon = Icons.Default.Visibility,
-                                backgroundColor = MaterialTheme.colorScheme.tertiaryContainer,
-                                textColor = MaterialTheme.colorScheme.onTertiaryContainer,
+                                backgroundColor = if (isHC) Color(0xFF101010) else MaterialTheme.colorScheme.tertiaryContainer,
+                                textColor = if (isHC) Color(0xFFFFD600) else MaterialTheme.colorScheme.onTertiaryContainer,
                             )
                         }
 
@@ -364,8 +350,8 @@ private fun ThemeCard(
                             ThemeBadge(
                                 text = stringResource(R.string.theme_current),
                                 icon = Icons.Default.Check,
-                                backgroundColor = MaterialTheme.colorScheme.primary,
-                                textColor = MaterialTheme.colorScheme.onPrimary,
+                                backgroundColor = if (isHC) Color(0xFFFFD600) else MaterialTheme.colorScheme.primary,
+                                textColor = if (isHC) Color.Black else MaterialTheme.colorScheme.onPrimary,
                             )
                         }
                     }
@@ -390,13 +376,19 @@ private fun ThemeCard(
                     )
 
                     Text(
-                        text = if (isOwned) {
+                        text = if (isSelected) {
+                            stringResource(R.string.theme_current)
+                        } else if (isPreviewing) {
+                            stringResource(R.string.theme_preview_temporary)
+                        } else if (isOwned) {
                             stringResource(R.string.theme_available)
                         } else {
                             stringResource(R.string.theme_locked)
                         },
                         style = MaterialTheme.typography.labelMedium,
-                        color = if (isOwned) {
+                        color = if (isSelected || isPreviewing) {
+                            if (isHC) Color(0xFFFFD600) else MaterialTheme.colorScheme.primary
+                        } else if (isOwned) {
                             MaterialTheme.colorScheme.primary
                         } else {
                             MaterialTheme.colorScheme.onSurfaceVariant
@@ -413,42 +405,29 @@ private fun ThemeCard(
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
 
-                // Botón Vista previa interno exclusivo para modo desarrollo
-                if (!isOwned && isDebugPreviewAllowed) {
+                // Botón discreto en la tarjeta si está bloqueado y no previsualizando
+                if (!isOwned && !isPreviewing) {
                     Spacer(modifier = Modifier.height(10.dp))
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.End,
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
-                        if (isPreviewing) {
-                            OutlinedButton(
-                                onClick = onExitPreview,
-                                contentPadding = PaddingValues(horizontal = 12.dp, vertical = 4.dp),
-                            ) {
-                                Text(
-                                    text = stringResource(R.string.theme_preview_exit),
-                                    style = MaterialTheme.typography.labelMedium,
-                                    fontWeight = FontWeight.SemiBold,
-                                )
-                            }
-                        } else {
-                            OutlinedButton(
-                                onClick = onDebugPreview,
-                                contentPadding = PaddingValues(horizontal = 12.dp, vertical = 4.dp),
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Default.Visibility,
-                                    contentDescription = null,
-                                    modifier = Modifier.size(16.dp),
-                                )
-                                Spacer(modifier = Modifier.width(6.dp))
-                                Text(
-                                    text = stringResource(R.string.theme_preview),
-                                    style = MaterialTheme.typography.labelMedium,
-                                    fontWeight = FontWeight.SemiBold,
-                                )
-                            }
+                        OutlinedButton(
+                            onClick = onPreview,
+                            contentPadding = PaddingValues(horizontal = 12.dp, vertical = 4.dp),
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Visibility,
+                                contentDescription = null,
+                                modifier = Modifier.size(16.dp),
+                            )
+                            Spacer(modifier = Modifier.width(6.dp))
+                            Text(
+                                text = stringResource(R.string.theme_preview),
+                                style = MaterialTheme.typography.labelMedium,
+                                fontWeight = FontWeight.SemiBold,
+                            )
                         }
                     }
                 }
@@ -465,10 +444,12 @@ private fun ThemeBadge(
     icon: androidx.compose.ui.graphics.vector.ImageVector? = null,
     modifier: Modifier = Modifier,
 ) {
+    val isHC = LocalHighContrast.current
     Surface(
         modifier = modifier,
         shape = RoundedCornerShape(12.dp),
         color = backgroundColor,
+        border = if (isHC) BorderStroke(1.dp, textColor) else null,
     ) {
         Row(
             modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
@@ -489,6 +470,190 @@ private fun ThemeBadge(
                 color = textColor,
                 fontWeight = FontWeight.SemiBold,
             )
+        }
+    }
+}
+
+@Composable
+private fun ThemePreviewBanner(
+    previewTheme: MiMomentoThemeDefinition,
+    onUseTheme: () -> Unit,
+    onExitPreview: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val isHC = LocalHighContrast.current
+    val fontScale = LocalDensity.current.fontScale
+
+    val containerColor = if (isHC) Color(0xFF101010) else MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.85f)
+    val contentColor = if (isHC) Color.White else MaterialTheme.colorScheme.onPrimaryContainer
+    val borderColor = if (isHC) Color(0xFFFFD600) else MaterialTheme.colorScheme.primary.copy(alpha = 0.6f)
+
+    Card(
+        modifier = modifier.fillMaxWidth(),
+        shape = MaterialTheme.shapes.medium,
+        colors = CardDefaults.cardColors(
+            containerColor = containerColor,
+            contentColor = contentColor,
+        ),
+        border = BorderStroke(if (isHC) 2.dp else 1.5.dp, borderColor),
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+        ) {
+            Text(
+                text = stringResource(R.string.theme_preview_temporary),
+                style = MaterialTheme.typography.labelMedium,
+                fontWeight = FontWeight.SemiBold,
+                color = if (isHC) Color(0xFFFFD600) else MaterialTheme.colorScheme.primary,
+            )
+            Spacer(modifier = Modifier.height(2.dp))
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                Text(
+                    text = stringResource(previewTheme.nameRes),
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = contentColor,
+                )
+                if (previewTheme.isPremium) {
+                    Surface(
+                        shape = RoundedCornerShape(8.dp),
+                        color = if (isHC) Color(0xFF101010) else MaterialTheme.colorScheme.secondaryContainer,
+                        border = if (isHC) BorderStroke(1.dp, Color(0xFFFFD600)) else null,
+                    ) {
+                        Row(
+                            modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(4.dp),
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Lock,
+                                contentDescription = null,
+                                tint = if (isHC) Color(0xFFFFD600) else MaterialTheme.colorScheme.onSecondaryContainer,
+                                modifier = Modifier.size(10.dp),
+                            )
+                            Text(
+                                text = stringResource(R.string.theme_premium),
+                                style = MaterialTheme.typography.labelSmall,
+                                fontWeight = FontWeight.SemiBold,
+                                color = if (isHC) Color(0xFFFFD600) else MaterialTheme.colorScheme.onSecondaryContainer,
+                            )
+                        }
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(14.dp))
+
+            // Disposición de botones: si fontScale > 1.15f (Grande / Muy grande), disposición vertical
+            if (fontScale > 1.15f) {
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                ) {
+                    Button(
+                        onClick = onUseTheme,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .heightIn(min = 48.dp),
+                        shape = RoundedCornerShape(8.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = if (isHC) Color(0xFFFFD600) else MaterialTheme.colorScheme.primary,
+                            contentColor = if (isHC) Color.Black else MaterialTheme.colorScheme.onPrimary,
+                        ),
+                    ) {
+                        Text(
+                            text = stringResource(R.string.theme_use_this_theme),
+                            style = MaterialTheme.typography.labelLarge,
+                            fontWeight = FontWeight.Bold,
+                            maxLines = 2,
+                            overflow = TextOverflow.Ellipsis,
+                            textAlign = TextAlign.Center,
+                        )
+                    }
+
+                    OutlinedButton(
+                        onClick = onExitPreview,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .heightIn(min = 48.dp),
+                        shape = RoundedCornerShape(8.dp),
+                        border = BorderStroke(
+                            width = if (isHC) 2.dp else 1.dp,
+                            color = if (isHC) Color.White else MaterialTheme.colorScheme.outline,
+                        ),
+                        colors = ButtonDefaults.outlinedButtonColors(
+                            containerColor = if (isHC) Color.Black else Color.Transparent,
+                            contentColor = if (isHC) Color.White else MaterialTheme.colorScheme.onSurface,
+                        ),
+                    ) {
+                        Text(
+                            text = stringResource(R.string.theme_preview_exit),
+                            style = MaterialTheme.typography.labelLarge,
+                            fontWeight = FontWeight.SemiBold,
+                            maxLines = 2,
+                            overflow = TextOverflow.Ellipsis,
+                            textAlign = TextAlign.Center,
+                        )
+                    }
+                }
+            } else {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Button(
+                        onClick = onUseTheme,
+                        modifier = Modifier
+                            .weight(1f)
+                            .heightIn(min = 48.dp),
+                        shape = RoundedCornerShape(8.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = if (isHC) Color(0xFFFFD600) else MaterialTheme.colorScheme.primary,
+                            contentColor = if (isHC) Color.Black else MaterialTheme.colorScheme.onPrimary,
+                        ),
+                    ) {
+                        Text(
+                            text = stringResource(R.string.theme_use_this_theme),
+                            style = MaterialTheme.typography.labelLarge,
+                            fontWeight = FontWeight.Bold,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            textAlign = TextAlign.Center,
+                        )
+                    }
+
+                    OutlinedButton(
+                        onClick = onExitPreview,
+                        modifier = Modifier
+                            .weight(1f)
+                            .heightIn(min = 48.dp),
+                        shape = RoundedCornerShape(8.dp),
+                        border = BorderStroke(
+                            width = if (isHC) 2.dp else 1.dp,
+                            color = if (isHC) Color.White else MaterialTheme.colorScheme.outline,
+                        ),
+                        colors = ButtonDefaults.outlinedButtonColors(
+                            containerColor = if (isHC) Color.Black else Color.Transparent,
+                            contentColor = if (isHC) Color.White else MaterialTheme.colorScheme.onSurface,
+                        ),
+                    ) {
+                        Text(
+                            text = stringResource(R.string.theme_preview_exit),
+                            style = MaterialTheme.typography.labelLarge,
+                            fontWeight = FontWeight.SemiBold,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            textAlign = TextAlign.Center,
+                        )
+                    }
+                }
+            }
         }
     }
 }

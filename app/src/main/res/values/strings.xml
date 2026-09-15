@@ -70,6 +70,9 @@
     <string name="theme_preview">Vista previa</string>
     <string name="theme_preview_active">Vista previa: %1$s</string>
     <string name="theme_preview_exit">Salir de vista previa</string>
+    <string name="theme_preview_temporary">Vista previa temporal</string>
+    <string name="theme_use_this_theme">Usar este tema</string>
+    <string name="theme_premium_required">Este tema requiere acceso Premium.</string>
     <string name="theme_preview_debug_only">Disponible solo para pruebas de desarrollo</string>
     <string name="theme_appearance_mode">Modo de apariencia</string>
     <string name="theme_appearance_day">Día</string>

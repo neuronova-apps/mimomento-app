@@ -33,11 +33,18 @@ data class ThemeUiState(
     val canEnableAutoTheme: Boolean = false,
     val debugPreviewThemeId: MiMomentoThemeId? = null,
     val isDebugPreviewAllowed: Boolean = false,
+    val previewTheme: MiMomentoThemeDefinition? = null,
+    val effectiveTheme: MiMomentoThemeDefinition = activeTheme,
 ) {
+    val isPreviewActive: Boolean
+        get() = previewTheme != null
+
     val isDebugPreviewActive: Boolean
-        get() = isDebugPreviewAllowed && debugPreviewThemeId != null
+        get() = isPreviewActive
 
     fun isThemeOwned(themeId: MiMomentoThemeId): Boolean = ownedThemeIds.contains(themeId)
+    fun isThemeUnlocked(themeId: MiMomentoThemeId): Boolean = isThemeOwned(themeId)
+    fun canUseTheme(themeId: MiMomentoThemeId): Boolean = isThemeUnlocked(themeId)
 }
 
 class ThemeViewModel(
@@ -49,12 +56,12 @@ class ThemeViewModel(
 
     private val scope: CoroutineScope = externalScope ?: viewModelScope
     private val sessionThemeIdFlow = MutableStateFlow<MiMomentoThemeId?>(null)
-    private val debugPreviewThemeIdFlow = MutableStateFlow<MiMomentoThemeId?>(null)
+    private val previewThemeIdFlow = MutableStateFlow<MiMomentoThemeId?>(null)
 
     val uiState: StateFlow<ThemeUiState> = combine(
         repository.preferencesFlow,
         sessionThemeIdFlow,
-        debugPreviewThemeIdFlow,
+        previewThemeIdFlow,
     ) { prefs, sessionThemeId, previewThemeId ->
         val owned = availabilityPolicy.getOwnedThemes()
         val canAuto = owned.size >= 2
@@ -67,17 +74,13 @@ class ThemeViewModel(
             sessionThemeId
         }
 
-        val effectiveThemeId = if (previewPolicy.isAllowed && previewThemeId != null) {
-            previewThemeId
-        } else {
-            resolvedSessionThemeId
-        }
-
-        val activeDef = MiMomentoThemeCatalog.fromThemeId(effectiveThemeId)
+        val effectiveThemeId = previewThemeId ?: resolvedSessionThemeId
+        val effectiveDef = MiMomentoThemeCatalog.fromThemeId(effectiveThemeId)
         val selectedDef = MiMomentoThemeCatalog.fromThemeId(prefs.selectedThemeId)
+        val previewDef = previewThemeId?.let { MiMomentoThemeCatalog.fromThemeId(it) }
 
         ThemeUiState(
-            activeTheme = activeDef,
+            activeTheme = effectiveDef,
             selectedTheme = selectedDef,
             appearanceMode = prefs.appearanceMode,
             autoThemeEnabled = prefs.autoThemeEnabled,
@@ -85,8 +88,10 @@ class ThemeViewModel(
             themes = MiMomentoThemeCatalog.themes,
             ownedThemeIds = owned,
             canEnableAutoTheme = canAuto,
-            debugPreviewThemeId = if (previewPolicy.isAllowed) previewThemeId else null,
+            debugPreviewThemeId = previewThemeId,
             isDebugPreviewAllowed = previewPolicy.isAllowed,
+            previewTheme = previewDef,
+            effectiveTheme = effectiveDef,
         )
     }.stateIn(
         scope = scope,
@@ -95,13 +100,35 @@ class ThemeViewModel(
     )
 
     fun selectTheme(themeId: MiMomentoThemeId) {
-        if (!availabilityPolicy.isThemeOwned(themeId)) {
+        if (!availabilityPolicy.canUseTheme(themeId)) {
             return
         }
+        previewThemeIdFlow.value = null
         sessionThemeIdFlow.value = themeId
         scope.launch {
             repository.setSelectedTheme(themeId)
         }
+    }
+
+    fun previewTheme(themeId: MiMomentoThemeId) {
+        previewThemeIdFlow.value = themeId
+    }
+
+    fun clearThemePreview() {
+        previewThemeIdFlow.value = null
+    }
+
+    fun confirmPreviewTheme(themeId: MiMomentoThemeId? = null): Boolean {
+        val targetId = themeId ?: previewThemeIdFlow.value ?: return false
+        if (!availabilityPolicy.canUseTheme(targetId)) {
+            return false
+        }
+        sessionThemeIdFlow.value = targetId
+        previewThemeIdFlow.value = null
+        scope.launch {
+            repository.setSelectedTheme(targetId)
+        }
+        return true
     }
 
     fun setAppearanceMode(mode: AppearanceMode) {
@@ -112,15 +139,15 @@ class ThemeViewModel(
 
     fun setDebugPreview(themeId: MiMomentoThemeId) {
         if (!previewPolicy.isAllowed) return
-        debugPreviewThemeIdFlow.value = themeId
+        previewTheme(themeId)
     }
 
     fun exitDebugPreview() {
-        debugPreviewThemeIdFlow.value = null
+        clearThemePreview()
     }
 
     fun clearDebugPreview() {
-        exitDebugPreview()
+        clearThemePreview()
     }
 
     fun toggleAutoTheme(enabled: Boolean) {

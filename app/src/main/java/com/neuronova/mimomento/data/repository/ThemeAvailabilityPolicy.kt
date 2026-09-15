@@ -6,6 +6,10 @@ import com.neuronova.mimomento.data.model.MiMomentoThemeId
 interface ThemeAvailabilityPolicy {
     fun isThemeOwned(themeId: MiMomentoThemeId): Boolean
     fun getOwnedThemes(): Set<MiMomentoThemeId>
+
+    fun isThemeUnlocked(themeId: MiMomentoThemeId): Boolean = isThemeOwned(themeId)
+    fun canUseTheme(themeId: MiMomentoThemeId): Boolean = isThemeUnlocked(themeId)
+    fun canUseTheme(theme: MiMomentoThemeDefinition): Boolean = canUseTheme(theme.id)
 }
 
 class DefaultThemeAvailabilityPolicy : ThemeAvailabilityPolicy {

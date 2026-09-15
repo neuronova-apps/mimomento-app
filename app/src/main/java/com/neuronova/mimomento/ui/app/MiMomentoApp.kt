@@ -128,7 +128,7 @@ fun MiMomentoApp(
     val accessibilityUiState by accessibilityViewModel?.uiState?.collectAsState() ?: remember {
         mutableStateOf(AccessibilityUiState())
     }
-    val activeTheme = themeUiState.activeTheme
+    val activeTheme = themeUiState.effectiveTheme
     val systemInDark = androidx.compose.foundation.isSystemInDarkTheme()
     val isDarkTheme = com.neuronova.mimomento.data.model.resolveIsDarkTheme(themeUiState.appearanceMode, systemInDark)
 
