@@ -45,6 +45,7 @@ import com.neuronova.mimomento.ui.components.ErrorView
 import com.neuronova.mimomento.ui.components.LoadingView
 import com.neuronova.mimomento.ui.devotionals.DevotionalsViewModel
 import com.neuronova.mimomento.ui.journal.JournalViewModel
+import com.neuronova.mimomento.ui.home.HomeViewModel
 import com.neuronova.mimomento.ui.navigation.MiMomentoDestinations
 import com.neuronova.mimomento.ui.navigation.MiMomentoNavHost
 import com.neuronova.mimomento.ui.navigation.TOP_LEVEL_DESTINATIONS
@@ -77,6 +78,7 @@ fun MiMomentoApp(
     ),
     journalViewModel: JournalViewModel? = null,
     progressViewModel: ProgressViewModel? = null,
+    homeViewModel: HomeViewModel? = null,
     themeViewModel: ThemeViewModel? = themeRepository?.let {
         viewModel(factory = ThemeViewModel.provideFactory(it, availabilityPolicy, previewPolicy))
     },
@@ -101,6 +103,12 @@ fun MiMomentoApp(
     val effectiveProgressViewModel: ProgressViewModel = progressViewModel ?: viewModel(
         factory = ProgressViewModel.provideFactory(
             repository = effectiveProgressRepository,
+        )
+    )
+    val effectiveHomeViewModel: HomeViewModel = homeViewModel ?: viewModel(
+        factory = HomeViewModel.provideFactory(
+            journalRepository = effectiveJournalRepository,
+            progressRepository = effectiveProgressRepository,
         )
     )
     val contentState by appContentViewModel.uiState.collectAsState()
@@ -192,6 +200,7 @@ fun MiMomentoApp(
                             prayersViewModel = prayersViewModel,
                             journalViewModel = effectiveJournalViewModel,
                             progressViewModel = effectiveProgressViewModel,
+                            homeViewModel = effectiveHomeViewModel,
                             progressRepository = effectiveProgressRepository,
                             themeViewModel = themeViewModel,
                             devotionalCount = state.devotionalCount,

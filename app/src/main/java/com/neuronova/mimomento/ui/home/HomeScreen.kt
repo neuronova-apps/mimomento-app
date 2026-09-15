@@ -33,6 +33,10 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -43,9 +47,37 @@ import com.neuronova.mimomento.ui.theme.ThemedCardAccentLine
 import com.neuronova.mimomento.ui.theme.themedCardBorder
 import com.neuronova.mimomento.ui.theme.themedCardColors
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
+    onNavigateToDevotionals: () -> Unit,
+    onNavigateToPrayers: () -> Unit,
+    onNavigateToJournal: () -> Unit,
+    onNavigateToProgress: () -> Unit,
+    onNavigateToSettings: () -> Unit,
+    modifier: Modifier = Modifier,
+    devotionalCount: Int = 0,
+    homeViewModel: HomeViewModel? = null,
+) {
+    val uiState by homeViewModel?.uiState?.collectAsState() ?: remember {
+        mutableStateOf(HomeUiState())
+    }
+
+    HomeScreenContent(
+        uiState = uiState,
+        onNavigateToDevotionals = onNavigateToDevotionals,
+        onNavigateToPrayers = onNavigateToPrayers,
+        onNavigateToJournal = onNavigateToJournal,
+        onNavigateToProgress = onNavigateToProgress,
+        onNavigateToSettings = onNavigateToSettings,
+        modifier = modifier,
+        devotionalCount = devotionalCount,
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun HomeScreenContent(
+    uiState: HomeUiState,
     onNavigateToDevotionals: () -> Unit,
     onNavigateToPrayers: () -> Unit,
     onNavigateToJournal: () -> Unit,
@@ -236,7 +268,193 @@ fun HomeScreen(
                 }
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(28.dp))
+
+            // ==========================================
+            // BLOQUE 1: Tu momento de hoy
+            // ==========================================
+            Text(
+                text = stringResource(R.string.home_section_moment_today),
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.SemiBold,
+                color = MaterialTheme.colorScheme.onBackground,
+            )
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            Card(
+                onClick = onNavigateToJournal,
+                modifier = Modifier.fillMaxWidth(),
+                shape = MaterialTheme.shapes.medium,
+                colors = themedCardColors(),
+                border = themedCardBorder(),
+            ) {
+                ThemedCardAccentLine()
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(18.dp),
+                ) {
+                    if (uiState.journalEntriesToday == 0) {
+                        Text(
+                            text = stringResource(R.string.home_moment_today_empty_title),
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.onSurface,
+                        )
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Text(
+                            text = stringResource(R.string.home_moment_today_empty_desc),
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                        Spacer(modifier = Modifier.height(14.dp))
+                        FilledTonalButton(
+                            onClick = onNavigateToJournal,
+                            modifier = Modifier.fillMaxWidth(),
+                            shape = MaterialTheme.shapes.medium,
+                            contentPadding = PaddingValues(horizontal = 16.dp, vertical = 12.dp),
+                        ) {
+                            Text(
+                                text = stringResource(R.string.home_moment_today_action_write),
+                                style = MaterialTheme.typography.labelLarge,
+                                fontWeight = FontWeight.SemiBold,
+                            )
+                        }
+                    } else {
+                        Text(
+                            text = stringResource(R.string.home_moment_today_recorded_title),
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.onSurface,
+                        )
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Text(
+                            text = if (uiState.journalEntriesToday == 1) {
+                                stringResource(R.string.home_moment_today_entry_single)
+                            } else {
+                                stringResource(
+                                    R.string.home_moment_today_entries_multiple,
+                                    uiState.journalEntriesToday,
+                                )
+                            },
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                        Spacer(modifier = Modifier.height(14.dp))
+                        FilledTonalButton(
+                            onClick = onNavigateToJournal,
+                            modifier = Modifier.fillMaxWidth(),
+                            shape = MaterialTheme.shapes.medium,
+                            contentPadding = PaddingValues(horizontal = 16.dp, vertical = 12.dp),
+                        ) {
+                            Text(
+                                text = stringResource(R.string.home_moment_today_action_view),
+                                style = MaterialTheme.typography.labelLarge,
+                                fontWeight = FontWeight.SemiBold,
+                            )
+                        }
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(28.dp))
+
+            // ==========================================
+            // BLOQUE 2: Esta semana
+            // ==========================================
+            Text(
+                text = stringResource(R.string.home_section_this_week),
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.SemiBold,
+                color = MaterialTheme.colorScheme.onBackground,
+            )
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            Card(
+                onClick = onNavigateToProgress,
+                modifier = Modifier.fillMaxWidth(),
+                shape = MaterialTheme.shapes.medium,
+                colors = themedCardColors(),
+                border = themedCardBorder(),
+            ) {
+                ThemedCardAccentLine()
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(18.dp),
+                ) {
+                    val hasWeeklyActivity = uiState.activeDaysThisWeek > 0 ||
+                        uiState.devotionalsThisWeek > 0 ||
+                        uiState.journalEntriesThisWeek > 0
+
+                    if (!hasWeeklyActivity) {
+                        Text(
+                            text = stringResource(R.string.home_weekly_empty_activity),
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    } else {
+                        Text(
+                            text = if (uiState.activeDaysThisWeek == 1) {
+                                stringResource(R.string.home_weekly_active_day_single)
+                            } else {
+                                stringResource(
+                                    R.string.home_weekly_active_days_multiple,
+                                    uiState.activeDaysThisWeek,
+                                )
+                            },
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.onSurface,
+                        )
+
+                        Spacer(modifier = Modifier.height(4.dp))
+
+                        val devotionalsText = if (uiState.devotionalsThisWeek == 1) {
+                            stringResource(R.string.home_weekly_devotional_single)
+                        } else {
+                            stringResource(
+                                R.string.home_weekly_devotionals_multiple,
+                                uiState.devotionalsThisWeek,
+                            )
+                        }
+
+                        val journalText = if (uiState.journalEntriesThisWeek == 1) {
+                            stringResource(R.string.home_weekly_journal_single)
+                        } else {
+                            stringResource(
+                                R.string.home_weekly_journals_multiple,
+                                uiState.journalEntriesThisWeek,
+                            )
+                        }
+
+                        Text(
+                            text = "$devotionalsText · $journalText",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(14.dp))
+
+                    FilledTonalButton(
+                        onClick = onNavigateToProgress,
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = MaterialTheme.shapes.medium,
+                        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 12.dp),
+                    ) {
+                        Text(
+                            text = stringResource(R.string.home_weekly_action_view_progress),
+                            style = MaterialTheme.typography.labelLarge,
+                            fontWeight = FontWeight.SemiBold,
+                        )
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(24.dp))
         }
     }
 }

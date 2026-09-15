@@ -18,6 +18,7 @@ import com.neuronova.mimomento.ui.devotionals.DevotionalsScreen
 import com.neuronova.mimomento.ui.devotionals.DevotionalsViewModel
 import androidx.compose.ui.res.stringResource
 import com.neuronova.mimomento.ui.home.HomeScreen
+import com.neuronova.mimomento.ui.home.HomeViewModel
 import com.neuronova.mimomento.ui.journal.JournalScreen
 import com.neuronova.mimomento.ui.prayers.PrayerGuideDetailScreen
 import com.neuronova.mimomento.ui.prayers.PrayerRouteDetailScreen
@@ -45,6 +46,7 @@ fun MiMomentoNavHost(
     themeViewModel: ThemeViewModel? = null,
     journalViewModel: JournalViewModel? = null,
     progressViewModel: ProgressViewModel? = null,
+    homeViewModel: HomeViewModel? = null,
     progressRepository: ProgressRepository? = null,
 ) {
     val coroutineScope = rememberCoroutineScope()
@@ -100,6 +102,7 @@ fun MiMomentoNavHost(
                     navController.navigate(MiMomentoDestinations.SETTINGS)
                 },
                 devotionalCount = devotionalCount,
+                homeViewModel = homeViewModel,
             )
         }
 
