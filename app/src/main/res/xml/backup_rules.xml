@@ -1,0 +1,8 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<full-backup-content>
+    <include domain="file" path="datastore" />
+    <include domain="file" path="progress_events.json" />
+    <include domain="sharedpref" path="." />
+    <exclude domain="file" path="journal_entries.json" />
+    <exclude domain="file" path="journal_entries.json.bak" />
+</full-backup-content>
